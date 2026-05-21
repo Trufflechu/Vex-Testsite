@@ -1,21 +1,18 @@
-# VEX Command
+# Drive Photo Upload
 
-A responsive VEX robotics web app for team scouting, parts inventory, build notes, tasks, and autonomous path planning.
+A mobile-friendly website that uploads photos to a Google Drive folder through Google Apps Script.
 
-## Use It Online
+## Setup
 
-This is a static website, so it can be hosted anywhere that serves HTML files.
+1. Create a Google Drive folder for uploads.
+2. Copy the folder ID from the folder URL.
+3. Go to https://script.google.com and create a new project.
+4. Paste the code from `google-apps-script.js`.
+5. Replace `PASTE_YOUR_GOOGLE_DRIVE_FOLDER_ID_HERE` with your folder ID.
+6. Deploy it as a Web App.
+7. Set access to anyone with the link.
+8. Copy the Web App URL and paste it into the website.
 
-Fast options:
+## Publish
 
-- Netlify: drag this folder into Netlify Drop.
-- Vercel: import the folder as a static project.
-- GitHub Pages: publish the folder from a repository.
-
-Open `index.html` locally to preview it before publishing.
-
-## Multi-Device Data
-
-Each device saves its own data in that browser. Use the down-arrow button to export your team data, then use the up-arrow button on another device to import it.
-
-For live syncing across multiple devices at the same time, the next step would be adding a small backend such as Firebase or Supabase.
+The website itself can stay on GitHub Pages. After setup, any phone or computer can open the site, choose photos, and upload them to the connected Drive folder.
