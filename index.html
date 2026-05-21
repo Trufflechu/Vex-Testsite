@@ -19,13 +19,14 @@
       <nav class="tabs" aria-label="Photo tools">
         <button class="tab active" type="button" data-tab="upload">Upload</button>
         <button class="tab" type="button" data-tab="library">Library</button>
+        <button class="tab" type="button" data-tab="settings">Settings</button>
       </nav>
 
-      <section class="panel" aria-labelledby="setup-title">
+      <section class="panel tab-panel" id="settingsPanel" aria-labelledby="setup-title">
         <div class="panel-heading">
           <div>
-            <p class="eyebrow">Setup</p>
-            <h2 id="setup-title">Connect your upload link</h2>
+            <p class="eyebrow">Settings</p>
+            <h2 id="setup-title">Upload connection</h2>
           </div>
           <span class="status" id="connectionStatus">Not connected</span>
         </div>

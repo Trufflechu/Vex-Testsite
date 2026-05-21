@@ -9,6 +9,7 @@ const message = document.getElementById("message");
 const tabs = document.querySelectorAll(".tab");
 const uploadPanel = document.getElementById("uploadPanel");
 const libraryPanel = document.getElementById("libraryPanel");
+const settingsPanel = document.getElementById("settingsPanel");
 const libraryGrid = document.getElementById("libraryGrid");
 const libraryMessage = document.getElementById("libraryMessage");
 const refreshLibrary = document.getElementById("refreshLibrary");
@@ -63,7 +64,7 @@ refreshLibrary.addEventListener("click", () => {
 uploadButton.addEventListener("click", async () => {
   const endpoint = endpointInput.value.trim();
   if (!endpoint) {
-    setMessage("Paste your Google Apps Script web app URL first.", "error");
+    setMessage("Open Settings and connect the Google Apps Script URL first.", "error");
     return;
   }
 
@@ -106,6 +107,7 @@ function switchTab(tabName) {
   tabs.forEach((tab) => tab.classList.toggle("active", tab.dataset.tab === tabName));
   uploadPanel.classList.toggle("active", tabName === "upload");
   libraryPanel.classList.toggle("active", tabName === "library");
+  settingsPanel.classList.toggle("active", tabName === "settings");
 
   if (tabName === "library") {
     loadLibrary();
@@ -115,7 +117,7 @@ function switchTab(tabName) {
 async function loadLibrary() {
   const endpoint = endpointInput.value.trim();
   if (!endpoint) {
-    setLibraryMessage("Paste your Google Apps Script web app URL first.", "error");
+    setLibraryMessage("Open Settings and connect the Google Apps Script URL first.", "error");
     libraryGrid.innerHTML = "";
     return;
   }
