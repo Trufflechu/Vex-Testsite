@@ -253,6 +253,27 @@ function renderScouting() {
     </tr>`)
     .join("");
 
+  document.getElementById("scoutingCards").innerHTML = data.scouting
+    .map((row, index) => `<article class="scout-card">
+      <div class="scout-card-head">
+        <label>Match <input value="${escapeAttr(row.match)}" data-scout="${index}" data-key="match"></label>
+        <label>Result
+          <select data-scout="${index}" data-key="result">
+            <option ${row.result === "Win" ? "selected" : ""}>Win</option>
+            <option ${row.result === "Loss" ? "selected" : ""}>Loss</option>
+            <option ${row.result === "Tie" ? "selected" : ""}>Tie</option>
+          </select>
+        </label>
+      </div>
+      <label>Partner <input value="${escapeAttr(row.partner)}" data-scout="${index}" data-key="partner"></label>
+      <div class="score-pair">
+        <label>Auton <input type="number" inputmode="numeric" value="${row.auton}" data-scout="${index}" data-key="auton"></label>
+        <label>Driver <input type="number" inputmode="numeric" value="${row.driver}" data-scout="${index}" data-key="driver"></label>
+      </div>
+      <label>Notes <textarea data-scout="${index}" data-key="notes">${escapeHtml(row.notes)}</textarea></label>
+    </article>`)
+    .join("");
+
   document.querySelectorAll("[data-scout]").forEach((input) => {
     input.addEventListener("input", (event) => {
       const { scout, key } = event.target.dataset;

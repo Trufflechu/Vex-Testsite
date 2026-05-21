@@ -26,6 +26,12 @@ body {
     sans-serif;
 }
 
+input,
+select,
+textarea {
+  font-size: 16px;
+}
+
 button,
 input,
 textarea,
@@ -178,7 +184,7 @@ textarea {
 .icon-button {
   border: 0;
   border-radius: 8px;
-  min-height: 40px;
+  min-height: 44px;
   padding: 0 14px;
   font-weight: 800;
 }
@@ -394,6 +400,10 @@ th,
   overflow-x: auto;
 }
 
+.scouting-cards {
+  display: none;
+}
+
 table {
   width: 100%;
   border-collapse: collapse;
@@ -434,8 +444,8 @@ td select {
 }
 
 .qty button {
-  width: 32px;
-  height: 32px;
+  width: 40px;
+  height: 40px;
   border: 1px solid var(--line);
   background: white;
   border-radius: 8px;
@@ -530,28 +540,108 @@ td select {
     min-width: 320px;
   }
 
+  .app {
+    padding-bottom: 74px;
+  }
+
   .workspace,
   .sidebar {
-    padding: 18px;
+    padding: 14px;
+  }
+
+  .sidebar {
+    gap: 12px;
   }
 
   .topbar,
-  .actions,
   .panel-heading {
     align-items: stretch;
     flex-direction: column;
   }
 
+  .topbar {
+    margin-bottom: 14px;
+  }
+
+  .topbar h2 {
+    font-size: 28px;
+  }
+
   .actions {
     flex-direction: row;
+    flex-wrap: wrap;
+  }
+
+  .actions .primary-button {
+    flex: 1 1 140px;
+  }
+
+  .icon-button {
+    flex: 0 0 46px;
+    width: 46px;
+  }
+
+  .brand-mark {
+    width: 38px;
+    height: 38px;
+    font-size: 21px;
+  }
+
+  .brand h1 {
+    font-size: 17px;
+  }
+
+  .brand p {
+    font-size: 13px;
   }
 
   .nav {
-    grid-template-columns: 1fr 1fr;
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 20;
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 0;
+    padding: 8px max(8px, env(safe-area-inset-left)) max(8px, env(safe-area-inset-bottom)) max(8px, env(safe-area-inset-right));
+    background: var(--charcoal);
+    border-top: 1px solid rgba(255, 255, 255, 0.12);
   }
 
   .nav-item {
-    justify-content: flex-start;
+    min-height: 56px;
+    justify-content: center;
+    flex-direction: column;
+    gap: 3px;
+    padding: 6px 4px;
+    border-radius: 8px;
+    font-size: 11px;
+    line-height: 1.1;
+    text-align: center;
+  }
+
+  .nav-item span {
+    font-size: 18px;
+  }
+
+  .team-card {
+    grid-template-columns: 1fr;
+    padding: 12px;
+  }
+
+  .metric-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  .metric,
+  .panel {
+    box-shadow: 0 10px 26px rgba(31, 40, 51, 0.08);
+  }
+
+  .metric {
+    padding: 14px;
   }
 
   .metric strong {
@@ -562,7 +652,98 @@ td select {
     height: 230px;
   }
 
+  .check-item,
+  .part-head,
+  .task-row,
+  .match-row {
+    align-items: flex-start;
+  }
+
+  .part-head {
+    flex-direction: column;
+  }
+
+  .task-row {
+    align-items: center;
+  }
+
+  .task-row input[type="checkbox"] {
+    flex: 0 0 auto;
+  }
+
+  .table-wrap {
+    display: none;
+  }
+
+  .scouting-cards {
+    display: grid;
+    gap: 12px;
+  }
+
+  .scout-card {
+    display: grid;
+    gap: 12px;
+    padding: 14px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: white;
+  }
+
+  .scout-card label {
+    display: grid;
+    gap: 6px;
+    color: var(--muted);
+    font-size: 13px;
+    font-weight: 800;
+  }
+
+  .scout-card input,
+  .scout-card select,
+  .scout-card textarea {
+    width: 100%;
+    min-height: 44px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 10px;
+    color: var(--ink);
+    background: #f8fafc;
+    font-weight: 500;
+  }
+
+  .scout-card textarea {
+    min-height: 82px;
+    resize: vertical;
+  }
+
+  .scout-card-head,
+  .score-pair {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  .inventory-grid {
+    grid-template-columns: 1fr;
+  }
+
   .field-board {
     min-height: 300px;
+  }
+
+  .tile.path::after {
+    inset: 14%;
+    font-size: 11px;
+  }
+}
+
+@media (max-width: 380px) {
+  .metric-grid,
+  .scout-card-head,
+  .score-pair {
+    grid-template-columns: 1fr;
+  }
+
+  .topbar h2 {
+    font-size: 25px;
   }
 }
