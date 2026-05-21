@@ -13,6 +13,10 @@ A mobile-friendly website that uploads photos to a Google Drive folder through G
 7. Set access to anyone with the link.
 8. Copy the Web App URL and paste it into the website.
 
+When you change `google-apps-script.js`, go to Apps Script, replace the code, then use Deploy > Manage deployments > Edit to create a new version. Keep the same Web App URL.
+
+The Library tab uses the same Web App URL to show a grid of image files from the Drive folder. Newly uploaded files are shared as "anyone with the link" so thumbnails can load in the website.
+
 ## Publish
 
 The website itself can stay on GitHub Pages. After setup, any phone or computer can open the site, choose photos, and upload them to the connected Drive folder.

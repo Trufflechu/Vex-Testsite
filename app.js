@@ -6,12 +6,24 @@ const queue = document.getElementById("queue");
 const uploadButton = document.getElementById("uploadButton");
 const clearQueue = document.getElementById("clearQueue");
 const message = document.getElementById("message");
+const tabs = document.querySelectorAll(".tab");
+const uploadPanel = document.getElementById("uploadPanel");
+const libraryPanel = document.getElementById("libraryPanel");
+const libraryGrid = document.getElementById("libraryGrid");
+const libraryMessage = document.getElementById("libraryMessage");
+const refreshLibrary = document.getElementById("refreshLibrary");
 
 let selectedFiles = [];
 
 endpointInput.value = localStorage.getItem("driveUploaderEndpoint") || "";
 updateConnectionStatus();
 renderQueue();
+
+tabs.forEach((tab) => {
+  tab.addEventListener("click", () => {
+    switchTab(tab.dataset.tab);
+  });
+});
 
 endpointInput.addEventListener("input", () => {
   localStorage.setItem("driveUploaderEndpoint", endpointInput.value.trim());
@@ -42,6 +54,10 @@ clearQueue.addEventListener("click", () => {
   selectedFiles = [];
   renderQueue();
   setMessage("", "");
+});
+
+refreshLibrary.addEventListener("click", () => {
+  loadLibrary();
 });
 
 uploadButton.addEventListener("click", async () => {
@@ -78,12 +94,69 @@ uploadButton.addEventListener("click", async () => {
     selectedFiles = [];
     renderQueue();
     setMessage(`Uploaded ${result.files.length} photo${result.files.length === 1 ? "" : "s"} to Google Drive.`, "success");
+    loadLibrary();
   } catch (error) {
     setMessage(error.message || "The upload failed. Check your Apps Script URL and permissions.", "error");
   } finally {
     uploadButton.disabled = false;
   }
 });
+
+function switchTab(tabName) {
+  tabs.forEach((tab) => tab.classList.toggle("active", tab.dataset.tab === tabName));
+  uploadPanel.classList.toggle("active", tabName === "upload");
+  libraryPanel.classList.toggle("active", tabName === "library");
+
+  if (tabName === "library") {
+    loadLibrary();
+  }
+}
+
+async function loadLibrary() {
+  const endpoint = endpointInput.value.trim();
+  if (!endpoint) {
+    setLibraryMessage("Paste your Google Apps Script web app URL first.", "error");
+    libraryGrid.innerHTML = "";
+    return;
+  }
+
+  refreshLibrary.disabled = true;
+  setLibraryMessage("Loading photos...", "");
+
+  try {
+    const url = new URL(endpoint);
+    url.searchParams.set("action", "list");
+    const response = await fetch(url.toString(), {
+      method: "GET",
+      mode: "cors"
+    });
+    const result = await response.json();
+    if (!response.ok || !result.success) {
+      throw new Error(result.error || "Could not load the photo library.");
+    }
+
+    renderLibrary(result.files);
+    setLibraryMessage(result.files.length ? `${result.files.length} photo${result.files.length === 1 ? "" : "s"} in the library.` : "No photos have been uploaded yet.", result.files.length ? "success" : "");
+  } catch (error) {
+    libraryGrid.innerHTML = "";
+    setLibraryMessage(error.message || "Could not load the library. Check your Apps Script deployment.", "error");
+  } finally {
+    refreshLibrary.disabled = false;
+  }
+}
+
+function renderLibrary(files) {
+  libraryGrid.innerHTML = files
+    .map((file) => `<article class="library-card">
+      <img src="${escapeAttr(file.thumbnailUrl)}" alt="${escapeAttr(file.name)}" loading="lazy">
+      <div class="library-card-info">
+        <strong>${escapeHtml(file.name)}</strong>
+        <small>${escapeHtml(file.created || "")}</small>
+      </div>
+      <a href="${escapeAttr(file.url)}" target="_blank" rel="noopener">Open</a>
+    </article>`)
+    .join("");
+}
 
 function addFiles(fileList) {
   const imageFiles = Array.from(fileList).filter((file) => file.type.startsWith("image/"));
@@ -143,6 +216,11 @@ function setMessage(text, type) {
   message.className = `message ${type}`;
 }
 
+function setLibraryMessage(text, type) {
+  libraryMessage.textContent = text;
+  libraryMessage.className = `message ${type}`;
+}
+
 function formatBytes(bytes) {
   if (bytes < 1024 * 1024) {
     return `${Math.round(bytes / 1024)} KB`;
@@ -152,4 +230,8 @@ function formatBytes(bytes) {
 
 function escapeHtml(value) {
   return String(value).replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;");
+}
+
+function escapeAttr(value) {
+  return escapeHtml(value).replaceAll('"', "&quot;");
 }

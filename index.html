@@ -12,9 +12,14 @@
     <main class="page">
       <section class="hero">
         <p class="eyebrow">Google Drive uploader</p>
-        <h1>Upload photos to your team folder</h1>
-        <p class="summary">Choose photos from your phone, tablet, or computer and send them straight to a Google Drive folder.</p>
+        <h1>Team photo library</h1>
+        <p class="summary">Upload photos from any device and browse the Drive folder in a clean grid view.</p>
       </section>
+
+      <nav class="tabs" aria-label="Photo tools">
+        <button class="tab active" type="button" data-tab="upload">Upload</button>
+        <button class="tab" type="button" data-tab="library">Library</button>
+      </nav>
 
       <section class="panel" aria-labelledby="setup-title">
         <div class="panel-heading">
@@ -31,7 +36,7 @@
         <p class="hint">Paste your deployed Apps Script URL here once. This page will remember it on this device.</p>
       </section>
 
-      <section class="panel" aria-labelledby="upload-title">
+      <section class="panel tab-panel active" id="uploadPanel" aria-labelledby="upload-title">
         <div class="panel-heading">
           <div>
             <p class="eyebrow">Upload</p>
@@ -49,6 +54,18 @@
         <div class="queue" id="queue" aria-live="polite"></div>
         <button class="primary-button" id="uploadButton" type="button">Upload photos</button>
         <p class="message" id="message" role="status"></p>
+      </section>
+
+      <section class="panel tab-panel" id="libraryPanel" aria-labelledby="library-title">
+        <div class="panel-heading">
+          <div>
+            <p class="eyebrow">Library</p>
+            <h2 id="library-title">Uploaded photos</h2>
+          </div>
+          <button class="secondary-button" id="refreshLibrary" type="button">Refresh</button>
+        </div>
+        <div class="library-grid" id="libraryGrid" aria-live="polite"></div>
+        <p class="message" id="libraryMessage" role="status"></p>
       </section>
     </main>
 
