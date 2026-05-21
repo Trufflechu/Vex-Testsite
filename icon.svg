@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="VEX Command icon">
+  <rect width="512" height="512" rx="88" fill="#202832"/>
+  <path d="M86 96h96l74 205 74-205h96L300 416h-88L86 96z" fill="#fff"/>
+  <path d="M82 96h102l30 84H112L82 96z" fill="#d73a31"/>
+  <path d="M328 96h102l-30 84H298l30-84z" fill="#2367d1"/>
+</svg>
