@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#f7f8fb" />
+    <meta name="theme-color" content="#07120d" />
     <meta name="description" content="Upload photos with notes and browse them from a connected Google Drive folder." />
     <title>Drive Photo Upload</title>
     <link rel="icon" href="icon.svg" type="image/svg+xml" />
@@ -11,18 +11,33 @@
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
+    <button class="menu-button" id="menuButton" type="button" aria-label="Open navigation" aria-expanded="false">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+    <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+    <aside class="sidebar" id="sidebar" aria-label="Photo tools">
+      <div class="sidebar-brand">
+        <div class="brand-icon" aria-hidden="true">P</div>
+        <div>
+          <strong>Photo Vault</strong>
+          <small>Drive uploader</small>
+        </div>
+      </div>
+      <nav class="side-nav">
+        <button class="tab active" type="button" data-tab="upload">Upload</button>
+        <button class="tab" type="button" data-tab="library">Library</button>
+        <button class="tab" type="button" data-tab="settings">Settings</button>
+      </nav>
+    </aside>
+
     <main class="page">
       <section class="hero">
         <p class="eyebrow">Google Drive uploader</p>
         <h1>Team photo library</h1>
         <p class="summary">Upload photos from any device and browse the Drive folder in a clean grid view.</p>
       </section>
-
-      <nav class="tabs" aria-label="Photo tools">
-        <button class="tab active" type="button" data-tab="upload">Upload</button>
-        <button class="tab" type="button" data-tab="library">Library</button>
-        <button class="tab" type="button" data-tab="settings">Settings</button>
-      </nav>
 
       <section class="panel tab-panel" id="settingsPanel" aria-labelledby="setup-title">
         <div class="panel-heading">

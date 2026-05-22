@@ -1,16 +1,16 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Photo library icon">
   <defs>
     <linearGradient id="bg" x1="72" y1="66" x2="438" y2="444" gradientUnits="userSpaceOnUse">
-      <stop offset="0" stop-color="#2367d1"/>
-      <stop offset="0.55" stop-color="#1f7a52"/>
-      <stop offset="1" stop-color="#17202a"/>
+      <stop offset="0" stop-color="#39ff88"/>
+      <stop offset="0.52" stop-color="#00d46f"/>
+      <stop offset="1" stop-color="#07120d"/>
     </linearGradient>
   </defs>
   <rect width="512" height="512" rx="96" fill="url(#bg)"/>
-  <rect x="104" y="140" width="304" height="232" rx="34" fill="#fff"/>
-  <rect x="134" y="174" width="244" height="150" rx="18" fill="#eaf2ff"/>
-  <circle cx="322" cy="220" r="28" fill="#f6bf3f"/>
-  <path d="M134 314l70-72 48 44 42-34 84 62v10H134z" fill="#2367d1"/>
-  <path d="M162 104h188c15 0 28 13 28 28v18H134v-18c0-15 13-28 28-28z" fill="#ffffff" opacity=".74"/>
-  <path d="M194 392h124" stroke="#fff" stroke-width="28" stroke-linecap="round" opacity=".88"/>
+  <rect x="104" y="140" width="304" height="232" rx="34" fill="#07120d" stroke="#ecfff4" stroke-width="16"/>
+  <rect x="134" y="174" width="244" height="150" rx="18" fill="#12271d"/>
+  <circle cx="322" cy="220" r="28" fill="#39ff88"/>
+  <path d="M134 314l70-72 48 44 42-34 84 62v10H134z" fill="#39ff88"/>
+  <path d="M162 104h188c15 0 28 13 28 28v18H134v-18c0-15 13-28 28-28z" fill="#ecfff4" opacity=".9"/>
+  <path d="M194 392h124" stroke="#ecfff4" stroke-width="28" stroke-linecap="round" opacity=".92"/>
 </svg>

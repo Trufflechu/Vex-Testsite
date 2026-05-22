@@ -23,6 +23,8 @@ const editorNotes = document.getElementById("editorNotes");
 const editorDriveLink = document.getElementById("editorDriveLink");
 const saveEditor = document.getElementById("saveEditor");
 const editorMessage = document.getElementById("editorMessage");
+const menuButton = document.getElementById("menuButton");
+const sidebarBackdrop = document.getElementById("sidebarBackdrop");
 
 let selectedFiles = [];
 let libraryFiles = [];
@@ -35,7 +37,23 @@ renderQueue();
 tabs.forEach((tab) => {
   tab.addEventListener("click", () => {
     switchTab(tab.dataset.tab);
+    closeSidebar();
   });
+});
+
+menuButton.addEventListener("click", () => {
+  document.body.classList.toggle("sidebar-open");
+  updateMenuState();
+});
+
+sidebarBackdrop.addEventListener("click", () => {
+  closeSidebar();
+});
+
+document.addEventListener("keydown", (event) => {
+  if (event.key === "Escape") {
+    closeSidebar();
+  }
 });
 
 endpointInput.addEventListener("input", () => {
@@ -132,6 +150,16 @@ function switchTab(tabName) {
   if (tabName === "library") {
     loadLibrary();
   }
+}
+
+function closeSidebar() {
+  document.body.classList.remove("sidebar-open");
+  updateMenuState();
+}
+
+function updateMenuState() {
+  const open = document.body.classList.contains("sidebar-open");
+  menuButton.setAttribute("aria-expanded", String(open));
 }
 
 async function loadLibrary() {
