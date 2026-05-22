@@ -546,7 +546,7 @@ function loadTeamMembers() {
 
 function defaultHomeSettings() {
   return {
-    title: "Team Photo Vault",
+    title: "2622T Tritium",
     intro: "A living gallery of our build season, events, and team milestones.",
     achievements: [
       "Add achievements in Settings",

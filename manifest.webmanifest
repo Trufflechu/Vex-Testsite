@@ -1,7 +1,7 @@
 {
-  "name": "Drive Photo Upload",
-  "short_name": "Photo Upload",
-  "description": "Upload photos with notes and browse them from a Google Drive folder.",
+  "name": "2622T Tritium",
+  "short_name": "Tritium",
+  "description": "2622T Tritium photo library, achievements, and team media uploader.",
   "start_url": ".",
   "scope": ".",
   "display": "standalone",
