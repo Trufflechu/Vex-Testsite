@@ -23,7 +23,7 @@ function doGet(event) {
       files.push({
         id: file.getId(),
         name: file.getName(),
-        note: file.getDescription(),
+        ...readMetadata(file),
         url: file.getUrl(),
         thumbnailUrl: "https://drive.google.com/thumbnail?id=" + file.getId() + "&sz=w600",
         created: Utilities.formatDate(file.getDateCreated(), Session.getScriptTimeZone(), "MMM d, yyyy"),
@@ -37,7 +37,10 @@ function doGet(event) {
       files: files.map((file) => ({
         id: file.id,
         name: file.name,
-        note: file.note,
+        title: file.title,
+        teamMember: file.teamMember,
+        dateTime: file.dateTime,
+        notes: file.notes,
         url: file.url,
         thumbnailUrl: file.thumbnailUrl,
         created: file.created
@@ -54,19 +57,22 @@ function doGet(event) {
 function doPost(event) {
   try {
     const body = JSON.parse(event.postData.contents);
+    if (body.action === "update") {
+      return updateFileMetadata(body);
+    }
+
     const folder = DriveApp.getFolderById(FOLDER_ID);
     const files = body.files.map((file) => {
       const bytes = Utilities.base64Decode(file.data);
       const blob = Utilities.newBlob(bytes, file.type, file.name);
       const created = folder.createFile(blob);
-      if (file.note) {
-        created.setDescription(file.note);
-      }
+      const metadata = normalizeMetadata(file.metadata, file.name);
+      created.setDescription(JSON.stringify(metadata));
       created.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
       return {
         id: created.getId(),
         name: created.getName(),
-        note: created.getDescription(),
+        ...metadata,
         url: created.getUrl(),
         thumbnailUrl: "https://drive.google.com/thumbnail?id=" + created.getId() + "&sz=w600"
       };
@@ -82,6 +88,47 @@ function doPost(event) {
       error: error.message
     });
   }
+}
+
+function updateFileMetadata(body) {
+  const file = DriveApp.getFileById(body.id);
+  const metadata = normalizeMetadata(body.metadata, file.getName());
+  file.setDescription(JSON.stringify(metadata));
+  return jsonResponse({
+    success: true,
+    file: {
+      id: file.getId(),
+      name: file.getName(),
+      ...metadata,
+      url: file.getUrl(),
+      thumbnailUrl: "https://drive.google.com/thumbnail?id=" + file.getId() + "&sz=w600"
+    }
+  });
+}
+
+function readMetadata(file) {
+  const description = file.getDescription();
+  if (!description) {
+    return normalizeMetadata({}, file.getName());
+  }
+
+  try {
+    return normalizeMetadata(JSON.parse(description), file.getName());
+  } catch (error) {
+    return normalizeMetadata({
+      notes: description
+    }, file.getName());
+  }
+}
+
+function normalizeMetadata(metadata, fallbackName) {
+  const safe = metadata || {};
+  return {
+    title: safe.title || fallbackName,
+    teamMember: safe.teamMember || "",
+    dateTime: safe.dateTime || "",
+    notes: safe.notes || safe.note || ""
+  };
 }
 
 function jsonResponse(data) {

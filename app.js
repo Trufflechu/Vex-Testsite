@@ -13,8 +13,20 @@ const settingsPanel = document.getElementById("settingsPanel");
 const libraryGrid = document.getElementById("libraryGrid");
 const libraryMessage = document.getElementById("libraryMessage");
 const refreshLibrary = document.getElementById("refreshLibrary");
+const photoDialog = document.getElementById("photoDialog");
+const closeEditor = document.getElementById("closeEditor");
+const editorImage = document.getElementById("editorImage");
+const editorTitle = document.getElementById("editorTitle");
+const editorMember = document.getElementById("editorMember");
+const editorDateTime = document.getElementById("editorDateTime");
+const editorNotes = document.getElementById("editorNotes");
+const editorDriveLink = document.getElementById("editorDriveLink");
+const saveEditor = document.getElementById("saveEditor");
+const editorMessage = document.getElementById("editorMessage");
 
 let selectedFiles = [];
+let libraryFiles = [];
+let editingFile = null;
 
 endpointInput.value = localStorage.getItem("driveUploaderEndpoint") || "";
 updateConnectionStatus();
@@ -59,6 +71,14 @@ clearQueue.addEventListener("click", () => {
 
 refreshLibrary.addEventListener("click", () => {
   loadLibrary();
+});
+
+closeEditor.addEventListener("click", () => {
+  photoDialog.close();
+});
+
+saveEditor.addEventListener("click", () => {
+  savePhotoDetails();
 });
 
 uploadButton.addEventListener("click", async () => {
@@ -137,7 +157,8 @@ async function loadLibrary() {
       throw new Error(result.error || "Could not load the photo library.");
     }
 
-    renderLibrary(result.files);
+    libraryFiles = result.files;
+    renderLibrary(libraryFiles);
     setLibraryMessage(result.files.length ? `${result.files.length} photo${result.files.length === 1 ? "" : "s"} in the library.` : "No photos have been uploaded yet.", result.files.length ? "success" : "");
   } catch (error) {
     libraryGrid.innerHTML = "";
@@ -152,13 +173,19 @@ function renderLibrary(files) {
     .map((file) => `<article class="library-card">
       <img src="${escapeAttr(file.thumbnailUrl)}" alt="${escapeAttr(file.name)}" loading="lazy">
       <div class="library-card-info">
-        <strong>${escapeHtml(file.name)}</strong>
-        <p>${escapeHtml(file.note || "No notes yet.")}</p>
-        <small>${escapeHtml(file.created || "")}</small>
+        <strong>${escapeHtml(file.title || file.name)}</strong>
+        <p>${escapeHtml(file.notes || "No notes yet.")}</p>
+        <small>${escapeHtml([file.teamMember, formatDisplayDate(file.dateTime || file.created)].filter(Boolean).join(" - "))}</small>
       </div>
-      <a href="${escapeAttr(file.url)}" target="_blank" rel="noopener">Open</a>
+      <button class="card-button" type="button" data-edit="${escapeAttr(file.id)}">Open</button>
     </article>`)
     .join("");
+
+  libraryGrid.querySelectorAll("[data-edit]").forEach((button) => {
+    button.addEventListener("click", () => {
+      openEditor(button.dataset.edit);
+    });
+  });
 }
 
 function addFiles(fileList) {
@@ -167,7 +194,10 @@ function addFiles(fileList) {
     ...selectedFiles,
     ...imageFiles.map((file) => ({
       file,
-      note: ""
+      title: file.name.replace(/\.[^/.]+$/, ""),
+      teamMember: "",
+      dateTime: toDateTimeLocal(new Date()),
+      notes: ""
     }))
   ];
   renderQueue();
@@ -186,9 +216,23 @@ function renderQueue() {
           <small>${formatBytes(item.file.size)}</small>
         </div>
         <button class="remove-button" type="button" data-remove="${index}">Remove</button>
+        <div class="metadata-grid">
+          <label class="note-field">
+            Photo title
+            <input data-field="title" data-index="${index}" value="${escapeAttr(item.title)}" placeholder="Photo title">
+          </label>
+          <label class="note-field">
+            Team member
+            <input data-field="teamMember" data-index="${index}" value="${escapeAttr(item.teamMember)}" placeholder="Name">
+          </label>
+          <label class="note-field">
+            Date and time
+            <input type="datetime-local" data-field="dateTime" data-index="${index}" value="${escapeAttr(item.dateTime)}">
+          </label>
+        </div>
         <label class="note-field">
           Notes
-          <textarea data-note="${index}" placeholder="Write a note for this photo">${escapeHtml(item.note)}</textarea>
+          <textarea data-field="notes" data-index="${index}" placeholder="Write notes for this photo">${escapeHtml(item.notes)}</textarea>
         </label>
       </article>`;
     })
@@ -201,9 +245,9 @@ function renderQueue() {
     });
   });
 
-  queue.querySelectorAll("[data-note]").forEach((textarea) => {
-    textarea.addEventListener("input", () => {
-      selectedFiles[Number(textarea.dataset.note)].note = textarea.value;
+  queue.querySelectorAll("[data-field]").forEach((input) => {
+    input.addEventListener("input", () => {
+      selectedFiles[Number(input.dataset.index)][input.dataset.field] = input.value;
     });
   });
 }
@@ -223,12 +267,81 @@ function fileToPayload(item) {
         name: item.file.name,
         type: item.file.type || "application/octet-stream",
         data: result.slice(result.indexOf(",") + 1),
-        note: item.note.trim()
+        metadata: {
+          title: item.title.trim(),
+          teamMember: item.teamMember.trim(),
+          dateTime: item.dateTime,
+          notes: item.notes.trim()
+        }
       });
     });
     reader.addEventListener("error", () => reject(new Error(`Could not read ${item.file.name}.`)));
     reader.readAsDataURL(item.file);
   });
+}
+
+function openEditor(fileId) {
+  editingFile = libraryFiles.find((file) => file.id === fileId);
+  if (!editingFile) {
+    return;
+  }
+
+  editorImage.src = editingFile.thumbnailUrl;
+  editorImage.alt = editingFile.title || editingFile.name;
+  editorTitle.value = editingFile.title || editingFile.name;
+  editorMember.value = editingFile.teamMember || "";
+  editorDateTime.value = editingFile.dateTime || "";
+  editorNotes.value = editingFile.notes || "";
+  editorDriveLink.href = editingFile.url;
+  setEditorMessage("", "");
+  photoDialog.showModal();
+}
+
+async function savePhotoDetails() {
+  const endpoint = endpointInput.value.trim();
+  if (!endpoint || !editingFile) {
+    setEditorMessage("Open Settings and connect the Google Apps Script URL first.", "error");
+    return;
+  }
+
+  saveEditor.disabled = true;
+  setEditorMessage("Saving changes...", "");
+
+  try {
+    const response = await fetch(endpoint, {
+      method: "POST",
+      mode: "cors",
+      headers: {
+        "Content-Type": "text/plain;charset=utf-8"
+      },
+      body: JSON.stringify({
+        action: "update",
+        id: editingFile.id,
+        metadata: {
+          title: editorTitle.value.trim(),
+          teamMember: editorMember.value.trim(),
+          dateTime: editorDateTime.value,
+          notes: editorNotes.value.trim()
+        }
+      })
+    });
+    const result = await response.json();
+    if (!response.ok || !result.success) {
+      throw new Error(result.error || "Could not save changes.");
+    }
+
+    editingFile = {
+      ...editingFile,
+      ...result.file
+    };
+    libraryFiles = libraryFiles.map((file) => file.id === editingFile.id ? editingFile : file);
+    renderLibrary(libraryFiles);
+    setEditorMessage("Saved.", "success");
+  } catch (error) {
+    setEditorMessage(error.message || "Could not save changes.", "error");
+  } finally {
+    saveEditor.disabled = false;
+  }
 }
 
 function setMessage(text, type) {
@@ -241,11 +354,44 @@ function setLibraryMessage(text, type) {
   libraryMessage.className = `message ${type}`;
 }
 
+function setEditorMessage(text, type) {
+  editorMessage.textContent = text;
+  editorMessage.className = `message ${type}`;
+}
+
 function formatBytes(bytes) {
   if (bytes < 1024 * 1024) {
     return `${Math.round(bytes / 1024)} KB`;
   }
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+}
+
+function toDateTimeLocal(date) {
+  const offsetMs = date.getTimezoneOffset() * 60000;
+  return new Date(date.getTime() - offsetMs).toISOString().slice(0, 16);
+}
+
+function formatDisplayDate(value) {
+  if (!value) {
+    return "";
+  }
+
+  if (!value.includes("T")) {
+    return value;
+  }
+
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) {
+    return value;
+  }
+
+  return date.toLocaleString([], {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+    hour: "numeric",
+    minute: "2-digit"
+  });
 }
 
 function escapeHtml(value) {

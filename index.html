@@ -72,6 +72,42 @@
       </section>
     </main>
 
+    <dialog class="photo-dialog" id="photoDialog">
+      <form class="photo-editor" method="dialog">
+        <div class="panel-heading">
+          <div>
+            <p class="eyebrow">Photo details</p>
+            <h2>Edit library photo</h2>
+          </div>
+          <button class="secondary-button" id="closeEditor" type="button">Close</button>
+        </div>
+        <img id="editorImage" alt="" />
+        <div class="editor-grid">
+          <label class="field">
+            Photo title
+            <input id="editorTitle" type="text" autocomplete="off" />
+          </label>
+          <label class="field">
+            Team member
+            <input id="editorMember" type="text" autocomplete="name" />
+          </label>
+          <label class="field">
+            Date and time
+            <input id="editorDateTime" type="datetime-local" />
+          </label>
+          <label class="field full-field">
+            Notes
+            <textarea id="editorNotes" placeholder="Write notes for this photo"></textarea>
+          </label>
+        </div>
+        <div class="editor-actions">
+          <a class="secondary-link" id="editorDriveLink" href="#" target="_blank" rel="noopener">Open in Drive</a>
+          <button class="primary-button" id="saveEditor" type="button">Save changes</button>
+        </div>
+        <p class="message" id="editorMessage" role="status"></p>
+      </form>
+    </dialog>
+
     <script src="app.js"></script>
   </body>
 </html>
