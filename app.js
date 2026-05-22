@@ -153,6 +153,7 @@ function renderLibrary(files) {
       <img src="${escapeAttr(file.thumbnailUrl)}" alt="${escapeAttr(file.name)}" loading="lazy">
       <div class="library-card-info">
         <strong>${escapeHtml(file.name)}</strong>
+        <p>${escapeHtml(file.note || "No notes yet.")}</p>
         <small>${escapeHtml(file.created || "")}</small>
       </div>
       <a href="${escapeAttr(file.url)}" target="_blank" rel="noopener">Open</a>
@@ -162,7 +163,13 @@ function renderLibrary(files) {
 
 function addFiles(fileList) {
   const imageFiles = Array.from(fileList).filter((file) => file.type.startsWith("image/"));
-  selectedFiles = [...selectedFiles, ...imageFiles];
+  selectedFiles = [
+    ...selectedFiles,
+    ...imageFiles.map((file) => ({
+      file,
+      note: ""
+    }))
+  ];
   renderQueue();
   setMessage(imageFiles.length ? "" : "Only image files can be added.", imageFiles.length ? "" : "error");
 }
@@ -170,15 +177,19 @@ function addFiles(fileList) {
 function renderQueue() {
   uploadButton.disabled = selectedFiles.length === 0;
   queue.innerHTML = selectedFiles
-    .map((file, index) => {
-      const url = URL.createObjectURL(file);
+    .map((item, index) => {
+      const url = URL.createObjectURL(item.file);
       return `<article class="photo-row">
         <img src="${url}" alt="">
         <div>
-          <strong>${escapeHtml(file.name)}</strong>
-          <small>${formatBytes(file.size)}</small>
+          <strong>${escapeHtml(item.file.name)}</strong>
+          <small>${formatBytes(item.file.size)}</small>
         </div>
         <button class="remove-button" type="button" data-remove="${index}">Remove</button>
+        <label class="note-field">
+          Notes
+          <textarea data-note="${index}" placeholder="Write a note for this photo">${escapeHtml(item.note)}</textarea>
+        </label>
       </article>`;
     })
     .join("");
@@ -189,6 +200,12 @@ function renderQueue() {
       renderQueue();
     });
   });
+
+  queue.querySelectorAll("[data-note]").forEach((textarea) => {
+    textarea.addEventListener("input", () => {
+      selectedFiles[Number(textarea.dataset.note)].note = textarea.value;
+    });
+  });
 }
 
 function updateConnectionStatus() {
@@ -197,19 +214,20 @@ function updateConnectionStatus() {
   connectionStatus.classList.toggle("connected", connected);
 }
 
-function fileToPayload(file) {
+function fileToPayload(item) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.addEventListener("load", () => {
       const result = String(reader.result);
       resolve({
-        name: file.name,
-        type: file.type || "application/octet-stream",
-        data: result.slice(result.indexOf(",") + 1)
+        name: item.file.name,
+        type: item.file.type || "application/octet-stream",
+        data: result.slice(result.indexOf(",") + 1),
+        note: item.note.trim()
       });
     });
-    reader.addEventListener("error", () => reject(new Error(`Could not read ${file.name}.`)));
-    reader.readAsDataURL(file);
+    reader.addEventListener("error", () => reject(new Error(`Could not read ${item.file.name}.`)));
+    reader.readAsDataURL(item.file);
   });
 }
 

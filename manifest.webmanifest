@@ -1,12 +1,12 @@
 {
-  "name": "VEX Command",
-  "short_name": "VEX Command",
-  "description": "A VEX robotics team workspace for scouting, parts, build notes, tasks, and autonomous planning.",
+  "name": "Drive Photo Upload",
+  "short_name": "Photo Upload",
+  "description": "Upload photos with notes and browse them from a Google Drive folder.",
   "start_url": ".",
   "scope": ".",
   "display": "standalone",
   "background_color": "#f4f6f8",
-  "theme_color": "#202832",
+  "theme_color": "#2367d1",
   "icons": [
     {
       "src": "icon.svg",

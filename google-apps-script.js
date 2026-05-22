@@ -23,6 +23,7 @@ function doGet(event) {
       files.push({
         id: file.getId(),
         name: file.getName(),
+        note: file.getDescription(),
         url: file.getUrl(),
         thumbnailUrl: "https://drive.google.com/thumbnail?id=" + file.getId() + "&sz=w600",
         created: Utilities.formatDate(file.getDateCreated(), Session.getScriptTimeZone(), "MMM d, yyyy"),
@@ -36,6 +37,7 @@ function doGet(event) {
       files: files.map((file) => ({
         id: file.id,
         name: file.name,
+        note: file.note,
         url: file.url,
         thumbnailUrl: file.thumbnailUrl,
         created: file.created
@@ -57,10 +59,14 @@ function doPost(event) {
       const bytes = Utilities.base64Decode(file.data);
       const blob = Utilities.newBlob(bytes, file.type, file.name);
       const created = folder.createFile(blob);
+      if (file.note) {
+        created.setDescription(file.note);
+      }
       created.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
       return {
         id: created.getId(),
         name: created.getName(),
+        note: created.getDescription(),
         url: created.getUrl(),
         thumbnailUrl: "https://drive.google.com/thumbnail?id=" + created.getId() + "&sz=w600"
       };

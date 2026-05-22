@@ -1,5 +1,5 @@
 :root {
-  --bg: #f7f8fb;
+  --bg: #f5f7fb;
   --surface: #ffffff;
   --ink: #17202a;
   --muted: #637083;
@@ -7,6 +7,7 @@
   --green: #1f7a52;
   --red: #c53030;
   --blue: #2367d1;
+  --sky: #eaf2ff;
   --shadow: 0 18px 48px rgba(31, 42, 55, 0.1);
 }
 
@@ -18,7 +19,9 @@ html,
 body {
   margin: 0;
   min-height: 100%;
-  background: var(--bg);
+  background:
+    radial-gradient(circle at top left, rgba(35, 103, 209, 0.13), transparent 34rem),
+    linear-gradient(180deg, #ffffff 0, var(--bg) 320px);
   color: var(--ink);
   font-family:
     Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
@@ -39,13 +42,13 @@ button {
 }
 
 .page {
-  width: min(920px, 100%);
+  width: min(1040px, 100%);
   margin: 0 auto;
   padding: 28px;
 }
 
 .hero {
-  padding: 28px 0 18px;
+  padding: 34px 0 22px;
 }
 
 .eyebrow {
@@ -90,6 +93,7 @@ h2 {
   padding: 6px;
   background: #e9eef5;
   border-radius: 8px;
+  border: 1px solid var(--line);
 }
 
 .tab {
@@ -182,7 +186,9 @@ h2 {
   text-align: center;
   border: 2px dashed #b8c5d6;
   border-radius: 8px;
-  background: #fbfcfe;
+  background:
+    linear-gradient(135deg, rgba(35, 103, 209, 0.08), rgba(31, 122, 82, 0.08)),
+    #fbfcfe;
 }
 
 .drop-zone.dragging {
@@ -254,6 +260,29 @@ h2 {
   font-weight: 900;
 }
 
+.note-field {
+  grid-column: 1 / -1;
+  display: grid;
+  gap: 7px;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.note-field textarea {
+  width: 100%;
+  min-height: 84px;
+  resize: vertical;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 11px;
+  color: var(--ink);
+  background: white;
+  font: inherit;
+  font-size: 16px;
+  font-weight: 500;
+}
+
 .primary-button {
   width: 100%;
   padding: 0 18px;
@@ -296,6 +325,7 @@ h2 {
   border: 1px solid var(--line);
   border-radius: 8px;
   background: #fbfcfe;
+  box-shadow: 0 10px 26px rgba(31, 42, 55, 0.07);
 }
 
 .library-card img {
@@ -318,8 +348,19 @@ h2 {
   white-space: nowrap;
 }
 
+.library-card p {
+  display: -webkit-box;
+  min-height: 42px;
+  margin: 7px 0 0;
+  overflow: hidden;
+  color: var(--ink);
+  line-height: 1.35;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
 .library-card small {
-  margin-top: 4px;
+  margin-top: 8px;
   color: var(--muted);
 }
 

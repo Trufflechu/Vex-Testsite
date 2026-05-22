@@ -1,6 +1,6 @@
 # Drive Photo Upload
 
-A mobile-friendly website that uploads photos to a Google Drive folder through Google Apps Script.
+A mobile-friendly website that uploads photos with notes to a Google Drive folder through Google Apps Script, then displays them in a Library grid.
 
 ## Setup
 
@@ -15,7 +15,7 @@ A mobile-friendly website that uploads photos to a Google Drive folder through G
 
 When you change `google-apps-script.js`, go to Apps Script, replace the code, then use Deploy > Manage deployments > Edit to create a new version. Keep the same Web App URL.
 
-The Library tab uses the same Web App URL to show a grid of image files from the Drive folder. Newly uploaded files are shared as "anyone with the link" so thumbnails can load in the website.
+The Library tab uses the same Web App URL to show a grid of image files from the Drive folder. Newly uploaded files are shared as "anyone with the link" so thumbnails can load in the website. Photo notes are saved as each Drive file's description.
 
 ## Publish
 
