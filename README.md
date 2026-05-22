@@ -1,6 +1,6 @@
 # Drive Photo Upload
 
-A mobile-friendly website that uploads photos with title, team member, date/time, and notes to a Google Drive folder through Google Apps Script, then displays and edits them in a Library grid.
+A mobile-friendly website that uploads photos with title, team member, date/time, album, category, tags, and notes to a Google Drive folder through Google Apps Script, then filters, sorts, edits, and deletes them from a Library grid.
 
 ## Setup
 
@@ -15,7 +15,7 @@ A mobile-friendly website that uploads photos with title, team member, date/time
 
 When you change `google-apps-script.js`, go to Apps Script, replace the code, then use Deploy > Manage deployments > Edit to create a new version. Keep the same Web App URL.
 
-The Library tab uses the same Web App URL to show a grid of image files from the Drive folder. Newly uploaded files are shared as "anyone with the link" so thumbnails can load in the website. Photo details are saved as structured data in each Drive file's description.
+The Library tab uses the same Web App URL to show a grid of image files from the Drive folder. Newly uploaded files are shared as "anyone with the link" so thumbnails can load in the website. Photo details are saved as structured data in each Drive file's description. Delete moves the file to trash in Google Drive.
 
 ## Publish
 

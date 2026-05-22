@@ -18,20 +18,37 @@ const closeEditor = document.getElementById("closeEditor");
 const editorImage = document.getElementById("editorImage");
 const editorTitle = document.getElementById("editorTitle");
 const editorMember = document.getElementById("editorMember");
+const editorAlbum = document.getElementById("editorAlbum");
+const editorCategory = document.getElementById("editorCategory");
+const editorTags = document.getElementById("editorTags");
 const editorDateTime = document.getElementById("editorDateTime");
 const editorNotes = document.getElementById("editorNotes");
 const editorDriveLink = document.getElementById("editorDriveLink");
 const saveEditor = document.getElementById("saveEditor");
+const deletePhoto = document.getElementById("deletePhoto");
 const editorMessage = document.getElementById("editorMessage");
 const menuButton = document.getElementById("menuButton");
 const sidebarBackdrop = document.getElementById("sidebarBackdrop");
+const teamMembersInput = document.getElementById("teamMembersInput");
+const searchFilter = document.getElementById("searchFilter");
+const albumFilter = document.getElementById("albumFilter");
+const categoryFilter = document.getElementById("categoryFilter");
+const memberFilter = document.getElementById("memberFilter");
+const tagFilter = document.getElementById("tagFilter");
+const sortSelect = document.getElementById("sortSelect");
+const clearFilters = document.getElementById("clearFilters");
+const albumOptions = document.getElementById("albumOptions");
+const categoryOptions = document.getElementById("categoryOptions");
 
 let selectedFiles = [];
 let libraryFiles = [];
 let editingFile = null;
+let teamMembers = loadTeamMembers();
 
 endpointInput.value = localStorage.getItem("driveUploaderEndpoint") || "";
+teamMembersInput.value = teamMembers.join("\n");
 updateConnectionStatus();
+renderTeamMemberControls();
 renderQueue();
 
 tabs.forEach((tab) => {
@@ -59,6 +76,37 @@ document.addEventListener("keydown", (event) => {
 endpointInput.addEventListener("input", () => {
   localStorage.setItem("driveUploaderEndpoint", endpointInput.value.trim());
   updateConnectionStatus();
+});
+
+teamMembersInput.addEventListener("input", () => {
+  teamMembers = parseLineList(teamMembersInput.value);
+  localStorage.setItem("driveUploaderTeamMembers", JSON.stringify(teamMembers));
+  renderTeamMemberControls();
+  renderQueue();
+  applyLibraryView();
+});
+
+[
+  searchFilter,
+  albumFilter,
+  categoryFilter,
+  memberFilter,
+  tagFilter,
+  sortSelect
+].forEach((control) => {
+  control.addEventListener("input", () => {
+    applyLibraryView();
+  });
+});
+
+clearFilters.addEventListener("click", () => {
+  searchFilter.value = "";
+  albumFilter.value = "";
+  categoryFilter.value = "";
+  memberFilter.value = "";
+  tagFilter.value = "";
+  sortSelect.value = "newest";
+  applyLibraryView();
 });
 
 photoInput.addEventListener("change", (event) => {
@@ -97,6 +145,10 @@ closeEditor.addEventListener("click", () => {
 
 saveEditor.addEventListener("click", () => {
   savePhotoDetails();
+});
+
+deletePhoto.addEventListener("click", () => {
+  deleteCurrentPhoto();
 });
 
 uploadButton.addEventListener("click", async () => {
@@ -185,15 +237,67 @@ async function loadLibrary() {
       throw new Error(result.error || "Could not load the photo library.");
     }
 
-    libraryFiles = result.files;
-    renderLibrary(libraryFiles);
-    setLibraryMessage(result.files.length ? `${result.files.length} photo${result.files.length === 1 ? "" : "s"} in the library.` : "No photos have been uploaded yet.", result.files.length ? "success" : "");
+    libraryFiles = result.files.map(normalizeFileRecord);
+    updateLibraryControls();
+    applyLibraryView();
   } catch (error) {
     libraryGrid.innerHTML = "";
     setLibraryMessage(error.message || "Could not load the library. Check your Apps Script deployment.", "error");
   } finally {
     refreshLibrary.disabled = false;
   }
+}
+
+function applyLibraryView() {
+  const files = sortFiles(filterFiles(libraryFiles));
+  renderLibrary(files);
+  const total = libraryFiles.length;
+  const shown = files.length;
+  setLibraryMessage(total ? `${shown} of ${total} photo${total === 1 ? "" : "s"} shown.` : "No photos have been uploaded yet.", total ? "success" : "");
+}
+
+function filterFiles(files) {
+  const query = searchFilter.value.trim().toLowerCase();
+  const album = albumFilter.value;
+  const category = categoryFilter.value;
+  const member = memberFilter.value;
+  const tag = tagFilter.value;
+
+  return files.filter((file) => {
+    const haystack = [
+      file.title,
+      file.name,
+      file.teamMember,
+      file.album,
+      file.category,
+      file.notes,
+      file.tags.join(" ")
+    ].join(" ").toLowerCase();
+
+    return (!query || haystack.includes(query))
+      && (!album || file.album === album)
+      && (!category || file.category === category)
+      && (!member || file.teamMember === member)
+      && (!tag || file.tags.includes(tag));
+  });
+}
+
+function sortFiles(files) {
+  return [...files].sort((a, b) => {
+    if (sortSelect.value === "oldest") {
+      return getSortTime(a) - getSortTime(b);
+    }
+    if (sortSelect.value === "title") {
+      return (a.title || a.name).localeCompare(b.title || b.name);
+    }
+    if (sortSelect.value === "member") {
+      return (a.teamMember || "").localeCompare(b.teamMember || "");
+    }
+    if (sortSelect.value === "album") {
+      return (a.album || "").localeCompare(b.album || "");
+    }
+    return getSortTime(b) - getSortTime(a);
+  });
 }
 
 function renderLibrary(files) {
@@ -203,7 +307,8 @@ function renderLibrary(files) {
       <div class="library-card-info">
         <strong>${escapeHtml(file.title || file.name)}</strong>
         <p>${escapeHtml(file.notes || "No notes yet.")}</p>
-        <small>${escapeHtml([file.teamMember, formatDisplayDate(file.dateTime || file.created)].filter(Boolean).join(" - "))}</small>
+        <small>${escapeHtml([file.teamMember, file.album, file.category, formatDisplayDate(file.dateTime || file.created)].filter(Boolean).join(" - "))}</small>
+        <div class="tag-row">${file.tags.map((tag) => `<span>${escapeHtml(tag)}</span>`).join("")}</div>
       </div>
       <button class="card-button" type="button" data-edit="${escapeAttr(file.id)}">Open</button>
     </article>`)
@@ -223,8 +328,11 @@ function addFiles(fileList) {
     ...imageFiles.map((file) => ({
       file,
       title: file.name.replace(/\.[^/.]+$/, ""),
-      teamMember: "",
+      teamMember: teamMembers[0] || "",
       dateTime: toDateTimeLocal(new Date()),
+      album: "",
+      category: "",
+      tags: "",
       notes: ""
     }))
   ];
@@ -251,11 +359,25 @@ function renderQueue() {
           </label>
           <label class="note-field">
             Team member
-            <input data-field="teamMember" data-index="${index}" value="${escapeAttr(item.teamMember)}" placeholder="Name">
+            <select data-field="teamMember" data-index="${index}">
+              ${teamMemberOptions(item.teamMember)}
+            </select>
           </label>
           <label class="note-field">
             Date and time
             <input type="datetime-local" data-field="dateTime" data-index="${index}" value="${escapeAttr(item.dateTime)}">
+          </label>
+          <label class="note-field">
+            Album
+            <input data-field="album" data-index="${index}" value="${escapeAttr(item.album)}" list="albumOptions" placeholder="Build log">
+          </label>
+          <label class="note-field">
+            Category
+            <input data-field="category" data-index="${index}" value="${escapeAttr(item.category)}" list="categoryOptions" placeholder="Drivetrain">
+          </label>
+          <label class="note-field">
+            Tags
+            <input data-field="tags" data-index="${index}" value="${escapeAttr(item.tags)}" placeholder="prototype, wiring">
           </label>
         </div>
         <label class="note-field">
@@ -286,6 +408,88 @@ function updateConnectionStatus() {
   connectionStatus.classList.toggle("connected", connected);
 }
 
+function updateLibraryControls() {
+  const albums = uniqueValues(libraryFiles.map((file) => file.album));
+  const categories = uniqueValues(libraryFiles.map((file) => file.category));
+  const members = uniqueValues([...teamMembers, ...libraryFiles.map((file) => file.teamMember)]);
+  const tags = uniqueValues(libraryFiles.flatMap((file) => file.tags));
+
+  fillSelect(albumFilter, albums, "All albums");
+  fillSelect(categoryFilter, categories, "All categories");
+  fillSelect(memberFilter, members, "All members");
+  fillSelect(tagFilter, tags, "All tags");
+  fillDatalist(albumOptions, albums);
+  fillDatalist(categoryOptions, categories);
+}
+
+function renderTeamMemberControls(selected = editorMember.value) {
+  editorMember.innerHTML = teamMemberOptions(selected);
+  updateLibraryControls();
+}
+
+function teamMemberOptions(selected = "") {
+  const names = uniqueValues(teamMembers);
+  const options = [`<option value="">Unassigned</option>`];
+  if (selected && !names.includes(selected)) {
+    names.unshift(selected);
+  }
+  options.push(...names.map((name) => `<option value="${escapeAttr(name)}" ${name === selected ? "selected" : ""}>${escapeHtml(name)}</option>`));
+  return options.join("");
+}
+
+function fillSelect(select, values, allLabel) {
+  const current = select.value;
+  select.innerHTML = `<option value="">${allLabel}</option>${values.map((value) => `<option value="${escapeAttr(value)}">${escapeHtml(value)}</option>`).join("")}`;
+  select.value = values.includes(current) ? current : "";
+}
+
+function fillDatalist(datalist, values) {
+  datalist.innerHTML = values.map((value) => `<option value="${escapeAttr(value)}"></option>`).join("");
+}
+
+function uniqueValues(values) {
+  return [...new Set(values.map((value) => String(value || "").trim()).filter(Boolean))].sort((a, b) => a.localeCompare(b));
+}
+
+function parseLineList(value) {
+  return uniqueValues(value.split(/\n+/));
+}
+
+function parseTags(value) {
+  if (Array.isArray(value)) {
+    return uniqueValues(value);
+  }
+  return uniqueValues(String(value || "").split(","));
+}
+
+function normalizeFileRecord(file) {
+  return {
+    ...file,
+    title: file.title || file.name || "Untitled photo",
+    teamMember: file.teamMember || "",
+    dateTime: file.dateTime || "",
+    album: file.album || "",
+    category: file.category || "",
+    tags: parseTags(file.tags || ""),
+    notes: file.notes || ""
+  };
+}
+
+function loadTeamMembers() {
+  try {
+    const saved = JSON.parse(localStorage.getItem("driveUploaderTeamMembers") || "[]");
+    return Array.isArray(saved) ? uniqueValues(saved) : [];
+  } catch {
+    return [];
+  }
+}
+
+function getSortTime(file) {
+  const value = file.dateTime || file.created || "";
+  const time = new Date(value).getTime();
+  return Number.isNaN(time) ? 0 : time;
+}
+
 function fileToPayload(item) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
@@ -299,6 +503,9 @@ function fileToPayload(item) {
           title: item.title.trim(),
           teamMember: item.teamMember.trim(),
           dateTime: item.dateTime,
+          album: item.album.trim(),
+          category: item.category.trim(),
+          tags: parseTags(item.tags),
           notes: item.notes.trim()
         }
       });
@@ -317,8 +524,11 @@ function openEditor(fileId) {
   editorImage.src = editingFile.thumbnailUrl;
   editorImage.alt = editingFile.title || editingFile.name;
   editorTitle.value = editingFile.title || editingFile.name;
-  editorMember.value = editingFile.teamMember || "";
+  renderTeamMemberControls(editingFile.teamMember || "");
   editorDateTime.value = editingFile.dateTime || "";
+  editorAlbum.value = editingFile.album || "";
+  editorCategory.value = editingFile.category || "";
+  editorTags.value = editingFile.tags.join(", ");
   editorNotes.value = editingFile.notes || "";
   editorDriveLink.href = editingFile.url;
   setEditorMessage("", "");
@@ -349,6 +559,9 @@ async function savePhotoDetails() {
           title: editorTitle.value.trim(),
           teamMember: editorMember.value.trim(),
           dateTime: editorDateTime.value,
+          album: editorAlbum.value.trim(),
+          category: editorCategory.value.trim(),
+          tags: parseTags(editorTags.value),
           notes: editorNotes.value.trim()
         }
       })
@@ -360,15 +573,59 @@ async function savePhotoDetails() {
 
     editingFile = {
       ...editingFile,
-      ...result.file
+      ...normalizeFileRecord(result.file)
     };
     libraryFiles = libraryFiles.map((file) => file.id === editingFile.id ? editingFile : file);
-    renderLibrary(libraryFiles);
+    updateLibraryControls();
+    applyLibraryView();
     setEditorMessage("Saved.", "success");
   } catch (error) {
     setEditorMessage(error.message || "Could not save changes.", "error");
   } finally {
     saveEditor.disabled = false;
+  }
+}
+
+async function deleteCurrentPhoto() {
+  const endpoint = endpointInput.value.trim();
+  if (!endpoint || !editingFile) {
+    setEditorMessage("Open Settings and connect the Google Apps Script URL first.", "error");
+    return;
+  }
+
+  if (!confirm("Delete this photo from the library? It will be moved to trash in Google Drive.")) {
+    return;
+  }
+
+  deletePhoto.disabled = true;
+  setEditorMessage("Deleting photo...", "");
+
+  try {
+    const response = await fetch(endpoint, {
+      method: "POST",
+      mode: "cors",
+      headers: {
+        "Content-Type": "text/plain;charset=utf-8"
+      },
+      body: JSON.stringify({
+        action: "delete",
+        id: editingFile.id
+      })
+    });
+    const result = await response.json();
+    if (!response.ok || !result.success) {
+      throw new Error(result.error || "Could not delete photo.");
+    }
+
+    libraryFiles = libraryFiles.filter((file) => file.id !== editingFile.id);
+    editingFile = null;
+    updateLibraryControls();
+    applyLibraryView();
+    photoDialog.close();
+  } catch (error) {
+    setEditorMessage(error.message || "Could not delete photo.", "error");
+  } finally {
+    deletePhoto.disabled = false;
   }
 }
 

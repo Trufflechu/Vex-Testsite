@@ -40,6 +40,9 @@ function doGet(event) {
         title: file.title,
         teamMember: file.teamMember,
         dateTime: file.dateTime,
+        album: file.album,
+        category: file.category,
+        tags: file.tags,
         notes: file.notes,
         url: file.url,
         thumbnailUrl: file.thumbnailUrl,
@@ -59,6 +62,9 @@ function doPost(event) {
     const body = JSON.parse(event.postData.contents);
     if (body.action === "update") {
       return updateFileMetadata(body);
+    }
+    if (body.action === "delete") {
+      return deleteFile(body);
     }
 
     const folder = DriveApp.getFolderById(FOLDER_ID);
@@ -106,6 +112,15 @@ function updateFileMetadata(body) {
   });
 }
 
+function deleteFile(body) {
+  const file = DriveApp.getFileById(body.id);
+  file.setTrashed(true);
+  return jsonResponse({
+    success: true,
+    id: body.id
+  });
+}
+
 function readMetadata(file) {
   const description = file.getDescription();
   if (!description) {
@@ -127,8 +142,21 @@ function normalizeMetadata(metadata, fallbackName) {
     title: safe.title || fallbackName,
     teamMember: safe.teamMember || "",
     dateTime: safe.dateTime || "",
+    album: safe.album || "",
+    category: safe.category || "",
+    tags: Array.isArray(safe.tags) ? safe.tags : parseTags(safe.tags),
     notes: safe.notes || safe.note || ""
   };
+}
+
+function parseTags(value) {
+  if (!value) {
+    return [];
+  }
+  if (Array.isArray(value)) {
+    return value.map(String).map((tag) => tag.trim()).filter(Boolean);
+  }
+  return String(value).split(",").map((tag) => tag.trim()).filter(Boolean);
 }
 
 function jsonResponse(data) {

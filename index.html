@@ -52,6 +52,11 @@
           <input id="endpointUrl" type="url" placeholder="https://script.google.com/macros/s/..." autocomplete="off" />
         </label>
         <p class="hint">Paste your deployed Apps Script URL here once. This page will remember it on this device.</p>
+        <label class="field">
+          Team members
+          <textarea id="teamMembersInput" placeholder="One name per line"></textarea>
+        </label>
+        <p class="hint">Names entered here appear in the team member dropdown when uploading or editing photos.</p>
       </section>
 
       <section class="panel tab-panel active" id="uploadPanel" aria-labelledby="upload-title">
@@ -82,6 +87,39 @@
           </div>
           <button class="secondary-button" id="refreshLibrary" type="button">Refresh</button>
         </div>
+        <div class="filter-grid">
+          <label class="field">
+            Search
+            <input id="searchFilter" type="search" placeholder="Title, notes, tags..." />
+          </label>
+          <label class="field">
+            Album
+            <select id="albumFilter"></select>
+          </label>
+          <label class="field">
+            Category
+            <select id="categoryFilter"></select>
+          </label>
+          <label class="field">
+            Team member
+            <select id="memberFilter"></select>
+          </label>
+          <label class="field">
+            Tag
+            <select id="tagFilter"></select>
+          </label>
+          <label class="field">
+            Sort
+            <select id="sortSelect">
+              <option value="newest">Newest first</option>
+              <option value="oldest">Oldest first</option>
+              <option value="title">Title A-Z</option>
+              <option value="member">Team member A-Z</option>
+              <option value="album">Album A-Z</option>
+            </select>
+          </label>
+        </div>
+        <button class="secondary-button" id="clearFilters" type="button">Clear filters</button>
         <div class="library-grid" id="libraryGrid" aria-live="polite"></div>
         <p class="message" id="libraryMessage" role="status"></p>
       </section>
@@ -104,7 +142,19 @@
           </label>
           <label class="field">
             Team member
-            <input id="editorMember" type="text" autocomplete="name" />
+            <select id="editorMember"></select>
+          </label>
+          <label class="field">
+            Album
+            <input id="editorAlbum" type="text" list="albumOptions" autocomplete="off" />
+          </label>
+          <label class="field">
+            Category
+            <input id="editorCategory" type="text" list="categoryOptions" autocomplete="off" />
+          </label>
+          <label class="field">
+            Tags
+            <input id="editorTags" type="text" placeholder="prototype, wiring, event" autocomplete="off" />
           </label>
           <label class="field">
             Date and time
@@ -117,11 +167,15 @@
         </div>
         <div class="editor-actions">
           <a class="secondary-link" id="editorDriveLink" href="#" target="_blank" rel="noopener">Open in Drive</a>
+          <button class="danger-button" id="deletePhoto" type="button">Delete</button>
           <button class="primary-button" id="saveEditor" type="button">Save changes</button>
         </div>
         <p class="message" id="editorMessage" role="status"></p>
       </form>
     </dialog>
+
+    <datalist id="albumOptions"></datalist>
+    <datalist id="categoryOptions"></datalist>
 
     <script src="app.js"></script>
   </body>
