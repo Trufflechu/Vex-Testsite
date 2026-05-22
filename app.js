@@ -7,6 +7,7 @@ const uploadButton = document.getElementById("uploadButton");
 const clearQueue = document.getElementById("clearQueue");
 const message = document.getElementById("message");
 const tabs = document.querySelectorAll(".tab");
+const homePanel = document.getElementById("homePanel");
 const uploadPanel = document.getElementById("uploadPanel");
 const libraryPanel = document.getElementById("libraryPanel");
 const settingsPanel = document.getElementById("settingsPanel");
@@ -39,17 +40,33 @@ const sortSelect = document.getElementById("sortSelect");
 const clearFilters = document.getElementById("clearFilters");
 const albumOptions = document.getElementById("albumOptions");
 const categoryOptions = document.getElementById("categoryOptions");
+const homeTitle = document.getElementById("home-title");
+const homeIntro = document.getElementById("homeIntro");
+const homeGallery = document.getElementById("homeGallery");
+const achievementList = document.getElementById("achievementList");
+const homeTitleInput = document.getElementById("homeTitleInput");
+const homeIntroInput = document.getElementById("homeIntroInput");
+const achievementsInput = document.getElementById("achievementsInput");
+const homeAlbumInput = document.getElementById("homeAlbumInput");
+const homeCategoryInput = document.getElementById("homeCategoryInput");
 
 let selectedFiles = [];
 let libraryFiles = [];
 let editingFile = null;
 let teamMembers = loadTeamMembers();
+let homeSettings = loadHomeSettings();
 
 endpointInput.value = localStorage.getItem("driveUploaderEndpoint") || "";
 teamMembersInput.value = teamMembers.join("\n");
+homeTitleInput.value = homeSettings.title;
+homeIntroInput.value = homeSettings.intro;
+achievementsInput.value = homeSettings.achievements.join("\n");
+homeAlbumInput.value = homeSettings.album;
+homeCategoryInput.value = homeSettings.category;
 updateConnectionStatus();
 renderTeamMemberControls();
 renderQueue();
+renderHome();
 
 tabs.forEach((tab) => {
   tab.addEventListener("click", () => {
@@ -96,6 +113,26 @@ teamMembersInput.addEventListener("input", () => {
 ].forEach((control) => {
   control.addEventListener("input", () => {
     applyLibraryView();
+  });
+});
+
+[
+  homeTitleInput,
+  homeIntroInput,
+  achievementsInput,
+  homeAlbumInput,
+  homeCategoryInput
+].forEach((control) => {
+  control.addEventListener("input", () => {
+    homeSettings = {
+      title: homeTitleInput.value.trim() || defaultHomeSettings().title,
+      intro: homeIntroInput.value.trim(),
+      achievements: parseLineList(achievementsInput.value),
+      album: homeAlbumInput.value.trim(),
+      category: homeCategoryInput.value.trim()
+    };
+    localStorage.setItem("driveUploaderHomeSettings", JSON.stringify(homeSettings));
+    renderHome();
   });
 });
 
@@ -195,11 +232,12 @@ uploadButton.addEventListener("click", async () => {
 
 function switchTab(tabName) {
   tabs.forEach((tab) => tab.classList.toggle("active", tab.dataset.tab === tabName));
+  homePanel.classList.toggle("active", tabName === "home");
   uploadPanel.classList.toggle("active", tabName === "upload");
   libraryPanel.classList.toggle("active", tabName === "library");
   settingsPanel.classList.toggle("active", tabName === "settings");
 
-  if (tabName === "library") {
+  if (tabName === "library" || tabName === "home") {
     loadLibrary();
   }
 }
@@ -251,9 +289,31 @@ async function loadLibrary() {
 function applyLibraryView() {
   const files = sortFiles(filterFiles(libraryFiles));
   renderLibrary(files);
+  renderHome();
   const total = libraryFiles.length;
   const shown = files.length;
   setLibraryMessage(total ? `${shown} of ${total} photo${total === 1 ? "" : "s"} shown.` : "No photos have been uploaded yet.", total ? "success" : "");
+}
+
+function renderHome() {
+  homeTitle.textContent = homeSettings.title;
+  homeIntro.textContent = homeSettings.intro || "Add an intro in Settings to describe your team, season, or project.";
+
+  const featured = sortFiles(libraryFiles.filter((file) => {
+    return (!homeSettings.album || file.album === homeSettings.album)
+      && (!homeSettings.category || file.category === homeSettings.category);
+  })).slice(0, 6);
+
+  homeGallery.innerHTML = featured.length
+    ? featured.map((file) => `<article class="home-photo">
+        <img src="${escapeAttr(file.thumbnailUrl)}" alt="${escapeAttr(file.title || file.name)}" loading="lazy">
+        <strong>${escapeHtml(file.title || file.name)}</strong>
+      </article>`).join("")
+    : `<div class="empty-state">Upload photos or adjust the featured album/category in Settings.</div>`;
+
+  achievementList.innerHTML = homeSettings.achievements.length
+    ? homeSettings.achievements.map((achievement) => `<article class="achievement-item">${escapeHtml(achievement)}</article>`).join("")
+    : `<article class="achievement-item">Add achievements in Settings.</article>`;
 }
 
 function filterFiles(files) {
@@ -481,6 +541,30 @@ function loadTeamMembers() {
     return Array.isArray(saved) ? uniqueValues(saved) : [];
   } catch {
     return [];
+  }
+}
+
+function defaultHomeSettings() {
+  return {
+    title: "Team Photo Vault",
+    intro: "A living gallery of our build season, events, and team milestones.",
+    achievements: [
+      "Add achievements in Settings",
+      "Feature your best build and event photos"
+    ],
+    album: "",
+    category: ""
+  };
+}
+
+function loadHomeSettings() {
+  try {
+    return {
+      ...defaultHomeSettings(),
+      ...JSON.parse(localStorage.getItem("driveUploaderHomeSettings") || "{}")
+    };
+  } catch {
+    return defaultHomeSettings();
   }
 }
 

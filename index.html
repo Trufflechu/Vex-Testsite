@@ -26,7 +26,8 @@
         </div>
       </div>
       <nav class="side-nav">
-        <button class="tab active" type="button" data-tab="upload">Upload</button>
+        <button class="tab active" type="button" data-tab="home">Home</button>
+        <button class="tab" type="button" data-tab="upload">Upload</button>
         <button class="tab" type="button" data-tab="library">Library</button>
         <button class="tab" type="button" data-tab="settings">Settings</button>
       </nav>
@@ -37,6 +38,24 @@
         <p class="eyebrow">Google Drive uploader</p>
         <h1>Team photo library</h1>
         <p class="summary">Upload photos from any device and browse the Drive folder in a clean grid view.</p>
+      </section>
+
+      <section class="home-panel tab-panel active" id="homePanel" aria-labelledby="home-title">
+        <div class="home-copy">
+          <p class="eyebrow">Team homepage</p>
+          <h2 id="home-title"></h2>
+          <p id="homeIntro"></p>
+        </div>
+        <div class="home-gallery" id="homeGallery" aria-label="Featured photos"></div>
+        <section class="panel achievements-panel">
+          <div class="panel-heading">
+            <div>
+              <p class="eyebrow">Achievements</p>
+              <h2>Team highlights</h2>
+            </div>
+          </div>
+          <div class="achievement-list" id="achievementList"></div>
+        </section>
       </section>
 
       <section class="panel tab-panel" id="settingsPanel" aria-labelledby="setup-title">
@@ -52,6 +71,35 @@
           <input id="endpointUrl" type="url" placeholder="https://script.google.com/macros/s/..." autocomplete="off" />
         </label>
         <p class="hint">Paste your deployed Apps Script URL here once. This page will remember it on this device.</p>
+        <div class="settings-section">
+          <div>
+            <p class="eyebrow">Home page</p>
+            <h2>Homepage content</h2>
+          </div>
+          <label class="field">
+            Home headline
+            <input id="homeTitleInput" type="text" autocomplete="off" />
+          </label>
+          <label class="field">
+            Home intro
+            <textarea id="homeIntroInput"></textarea>
+          </label>
+          <label class="field">
+            Achievements
+            <textarea id="achievementsInput" placeholder="One achievement per line"></textarea>
+          </label>
+          <div class="filter-grid">
+            <label class="field">
+              Featured album
+              <input id="homeAlbumInput" type="text" list="albumOptions" placeholder="Leave blank for all albums" />
+            </label>
+            <label class="field">
+              Featured category
+              <input id="homeCategoryInput" type="text" list="categoryOptions" placeholder="Leave blank for all categories" />
+            </label>
+          </div>
+          <p class="hint">The Home page shows the newest library photos matching the album and category above.</p>
+        </div>
         <label class="field">
           Team members
           <textarea id="teamMembersInput" placeholder="One name per line"></textarea>
@@ -59,7 +107,7 @@
         <p class="hint">Names entered here appear in the team member dropdown when uploading or editing photos.</p>
       </section>
 
-      <section class="panel tab-panel active" id="uploadPanel" aria-labelledby="upload-title">
+      <section class="panel tab-panel" id="uploadPanel" aria-labelledby="upload-title">
         <div class="panel-heading">
           <div>
             <p class="eyebrow">Upload</p>

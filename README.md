@@ -1,6 +1,6 @@
 # Drive Photo Upload
 
-A mobile-friendly website that uploads photos with title, team member, date/time, album, category, tags, and notes to a Google Drive folder through Google Apps Script, then filters, sorts, edits, and deletes them from a Library grid.
+A mobile-friendly website with an editable homepage, achievements, and featured photos. It uploads photos with title, team member, date/time, album, category, tags, and notes to a Google Drive folder through Google Apps Script, then filters, sorts, edits, and deletes them from a Library grid.
 
 ## Setup
 
