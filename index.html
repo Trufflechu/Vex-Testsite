@@ -11,6 +11,22 @@
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
+    <section class="intro-screen" id="introScreen" aria-label="Loading intro">
+      <div class="intro-grid" aria-hidden="true"></div>
+      <div class="intro-content">
+        <p class="intro-kicker">2622T // Robotics Archive</p>
+        <h2>TRITIUM</h2>
+        <div class="intro-progress" aria-hidden="true">
+          <span id="introProgress"></span>
+        </div>
+        <div class="intro-meta">
+          <span id="introPercent">00</span>
+          <span>Loading media vault</span>
+        </div>
+        <button class="intro-continue" id="introContinue" type="button">Continue - Continue -</button>
+      </div>
+    </section>
+
     <button class="menu-button" id="menuButton" type="button" aria-label="Open navigation" aria-expanded="false">
       <span></span>
       <span></span>
@@ -38,6 +54,7 @@
         <p class="eyebrow">2025-2026 // Robotics Media Archive</p>
         <h1>2622T<br />TRITIUM</h1>
         <p class="summary">A high-contrast archive for build progress, competition moments, team achievements, and the photos that tell the season story.</p>
+        <button class="replay-intro" id="replayIntro" type="button">Replay Intro</button>
         <div class="marquee-strip" aria-label="Team focus areas">
           <span>Engineering Builds</span>
           <span>Strategic Planning</span>

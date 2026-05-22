@@ -50,6 +50,114 @@ button {
   cursor: pointer;
 }
 
+.intro-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  color: #ffffff;
+  background: #050505;
+  transition: opacity 0.45s ease, visibility 0.45s ease;
+}
+
+.intro-hidden {
+  visibility: hidden;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.intro-grid {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(90deg, rgba(255, 255, 255, 0.09) 1px, transparent 1px),
+    linear-gradient(rgba(255, 255, 255, 0.09) 1px, transparent 1px);
+  background-size: 56px 56px;
+  mask-image: radial-gradient(circle at center, black, transparent 72%);
+}
+
+.intro-content {
+  position: relative;
+  z-index: 1;
+  width: min(980px, calc(100% - 36px));
+  display: grid;
+  gap: 18px;
+}
+
+.intro-kicker {
+  margin: 0;
+  color: var(--green);
+  font-size: 13px;
+  font-weight: 1000;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+}
+
+.intro-content h2 {
+  margin: 0;
+  font-size: clamp(58px, 17vw, 188px);
+  line-height: 0.82;
+  letter-spacing: 0.16em;
+  text-indent: 0.16em;
+  text-transform: uppercase;
+}
+
+.intro-progress {
+  height: 14px;
+  border: 2px solid #ffffff;
+  background: #171717;
+}
+
+.intro-progress span {
+  display: block;
+  width: 0;
+  height: 100%;
+  background: var(--green);
+  transition: width 0.08s linear;
+}
+
+.intro-meta {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  font-size: 14px;
+  font-weight: 1000;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.intro-continue,
+.replay-intro {
+  justify-self: start;
+  min-height: 46px;
+  padding: 0 18px;
+  border: 2px solid #ffffff;
+  border-radius: 0;
+  color: #ffffff;
+  background: transparent;
+  font-weight: 1000;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.intro-continue {
+  opacity: 0.45;
+  pointer-events: none;
+}
+
+.intro-complete .intro-continue {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.intro-continue:hover,
+.replay-intro:hover {
+  color: var(--ink);
+  background: var(--green);
+}
+
 .menu-button {
   position: fixed;
   top: 20px;
@@ -210,6 +318,12 @@ h2 {
   color: var(--muted);
   font-size: 20px;
   line-height: 1.5;
+}
+
+.replay-intro {
+  margin-top: 18px;
+  border-color: var(--line);
+  color: var(--ink);
 }
 
 .marquee-strip {

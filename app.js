@@ -49,6 +49,11 @@ const homeIntroInput = document.getElementById("homeIntroInput");
 const achievementsInput = document.getElementById("achievementsInput");
 const homeAlbumInput = document.getElementById("homeAlbumInput");
 const homeCategoryInput = document.getElementById("homeCategoryInput");
+const introScreen = document.getElementById("introScreen");
+const introProgress = document.getElementById("introProgress");
+const introPercent = document.getElementById("introPercent");
+const introContinue = document.getElementById("introContinue");
+const replayIntro = document.getElementById("replayIntro");
 
 let selectedFiles = [];
 let libraryFiles = [];
@@ -67,6 +72,7 @@ updateConnectionStatus();
 renderTeamMemberControls();
 renderQueue();
 renderHome();
+startIntro();
 
 tabs.forEach((tab) => {
   tab.addEventListener("click", () => {
@@ -188,6 +194,15 @@ deletePhoto.addEventListener("click", () => {
   deleteCurrentPhoto();
 });
 
+introContinue.addEventListener("click", () => {
+  finishIntro();
+});
+
+replayIntro.addEventListener("click", () => {
+  localStorage.removeItem("tritiumIntroSeen");
+  startIntro(true);
+});
+
 uploadButton.addEventListener("click", async () => {
   const endpoint = endpointInput.value.trim();
   if (!endpoint) {
@@ -250,6 +265,41 @@ function closeSidebar() {
 function updateMenuState() {
   const open = document.body.classList.contains("sidebar-open");
   menuButton.setAttribute("aria-expanded", String(open));
+}
+
+function startIntro(force = false) {
+  if (!force && localStorage.getItem("tritiumIntroSeen") === "true") {
+    introScreen.classList.add("intro-hidden");
+    return;
+  }
+
+  introScreen.classList.remove("intro-hidden", "intro-complete");
+  introProgress.style.width = "0%";
+  introPercent.textContent = "00";
+
+  const startedAt = performance.now();
+  const duration = 1650;
+
+  function tick(now) {
+    const progress = Math.min((now - startedAt) / duration, 1);
+    const eased = 1 - Math.pow(1 - progress, 3);
+    const percent = Math.round(eased * 100);
+    introProgress.style.width = `${percent}%`;
+    introPercent.textContent = String(percent).padStart(2, "0");
+
+    if (progress < 1 && !introScreen.classList.contains("intro-hidden")) {
+      requestAnimationFrame(tick);
+    } else {
+      introScreen.classList.add("intro-complete");
+    }
+  }
+
+  requestAnimationFrame(tick);
+}
+
+function finishIntro() {
+  localStorage.setItem("tritiumIntroSeen", "true");
+  introScreen.classList.add("intro-hidden");
 }
 
 async function loadLibrary() {
