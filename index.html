@@ -62,6 +62,11 @@
       </div>
       <nav class="side-nav">
         <button class="tab active" type="button" data-tab="home">Home</button>
+        <button class="tab" type="button" data-tab="engineering-builds">Engineering Builds</button>
+        <button class="tab" type="button" data-tab="strategic-planning">Strategic Planning</button>
+        <button class="tab" type="button" data-tab="software-implementation">Software Implementation</button>
+        <button class="tab" type="button" data-tab="research-development">Research & Development</button>
+        <button class="tab" type="button" data-tab="project-documentation">Project Documentation</button>
         <button class="tab" type="button" data-tab="upload">Upload</button>
         <button class="tab" type="button" data-tab="library">Library</button>
         <button class="tab" type="button" data-tab="settings">Settings</button>
@@ -75,15 +80,7 @@
         <p class="summary">A high-contrast archive for build progress, competition moments, team achievements, and the photos that tell the season story.</p>
       </section>
 
-      <nav class="section-nav active" id="sectionNav" aria-label="Home subpages">
-        <button class="active" type="button" data-focus-target="engineering-builds">Engineering Builds</button>
-        <button type="button" data-focus-target="strategic-planning">Strategic Planning</button>
-        <button type="button" data-focus-target="software-implementation">Software Implementation</button>
-        <button type="button" data-focus-target="research-development">Research & Development</button>
-        <button type="button" data-focus-target="project-documentation">Project Documentation</button>
-      </nav>
-
-      <section class="home-panel tab-panel active" id="homePanel" aria-labelledby="home-title">
+      <section class="home-panel tab-panel active" id="homePanel" data-panel="home" aria-labelledby="home-title">
         <div class="home-copy">
           <p class="eyebrow">2622T Tritium homepage</p>
           <h2 id="home-title"></h2>
@@ -99,34 +96,35 @@
           </div>
           <div class="achievement-list" id="achievementList"></div>
         </section>
-        <section class="focus-section active" id="engineering-builds">
-          <p class="eyebrow">01 // Build</p>
-          <h2>Engineering Builds</h2>
-          <p>Track robot iterations, mechanical experiments, subsystem changes, and the physical work that moves the season forward.</p>
-        </section>
-        <section class="focus-section" id="strategic-planning">
-          <p class="eyebrow">02 // Strategy</p>
-          <h2>Strategic Planning</h2>
-          <p>Collect match prep, decision logs, scouting takeaways, and competition strategy photos in one place.</p>
-        </section>
-        <section class="focus-section" id="software-implementation">
-          <p class="eyebrow">03 // Software</p>
-          <h2>Software Implementation</h2>
-          <p>Document autonomous testing, control tuning, code reviews, and the software work behind the robot.</p>
-        </section>
-        <section class="focus-section" id="research-development">
-          <p class="eyebrow">04 // R&D</p>
-          <h2>Research & Development</h2>
-          <p>Save prototypes, failed ideas, design comparisons, and the experiments that shape better engineering choices.</p>
-        </section>
-        <section class="focus-section" id="project-documentation">
-          <p class="eyebrow">05 // Archive</p>
-          <h2>Project Documentation</h2>
-          <p>Keep notebook evidence, outreach photos, event records, and final season documentation organized for review.</p>
-        </section>
       </section>
 
-      <section class="panel tab-panel" id="settingsPanel" aria-labelledby="setup-title">
+      <section class="focus-section tab-panel" id="engineering-buildsPanel" data-panel="engineering-builds" aria-labelledby="engineering-builds-title">
+        <p class="eyebrow">01 // Build</p>
+        <h2 id="engineering-builds-title">Engineering Builds</h2>
+        <p>Track robot iterations, mechanical experiments, subsystem changes, and the physical work that moves the season forward.</p>
+      </section>
+      <section class="focus-section tab-panel" id="strategic-planningPanel" data-panel="strategic-planning" aria-labelledby="strategic-planning-title">
+        <p class="eyebrow">02 // Strategy</p>
+        <h2 id="strategic-planning-title">Strategic Planning</h2>
+        <p>Collect match prep, decision logs, scouting takeaways, and competition strategy photos in one place.</p>
+      </section>
+      <section class="focus-section tab-panel" id="software-implementationPanel" data-panel="software-implementation" aria-labelledby="software-implementation-title">
+        <p class="eyebrow">03 // Software</p>
+        <h2 id="software-implementation-title">Software Implementation</h2>
+        <p>Document autonomous testing, control tuning, code reviews, and the software work behind the robot.</p>
+      </section>
+      <section class="focus-section tab-panel" id="research-developmentPanel" data-panel="research-development" aria-labelledby="research-development-title">
+        <p class="eyebrow">04 // R&D</p>
+        <h2 id="research-development-title">Research & Development</h2>
+        <p>Save prototypes, failed ideas, design comparisons, and the experiments that shape better engineering choices.</p>
+      </section>
+      <section class="focus-section tab-panel" id="project-documentationPanel" data-panel="project-documentation" aria-labelledby="project-documentation-title">
+        <p class="eyebrow">05 // Archive</p>
+        <h2 id="project-documentation-title">Project Documentation</h2>
+        <p>Keep notebook evidence, outreach photos, event records, and final season documentation organized for review.</p>
+      </section>
+
+      <section class="panel tab-panel" id="settingsPanel" data-panel="settings" aria-labelledby="setup-title">
         <div class="panel-heading">
           <div>
             <p class="eyebrow">Settings</p>
@@ -175,7 +173,7 @@
         <p class="hint">Names entered here appear in the team member dropdown when uploading or editing photos.</p>
       </section>
 
-      <section class="panel tab-panel" id="uploadPanel" aria-labelledby="upload-title">
+      <section class="panel tab-panel" id="uploadPanel" data-panel="upload" aria-labelledby="upload-title">
         <div class="panel-heading">
           <div>
             <p class="eyebrow">Upload</p>
@@ -195,7 +193,7 @@
         <p class="message" id="message" role="status"></p>
       </section>
 
-      <section class="panel tab-panel" id="libraryPanel" aria-labelledby="library-title">
+      <section class="panel tab-panel" id="libraryPanel" data-panel="library" aria-labelledby="library-title">
         <div class="panel-heading">
           <div>
             <p class="eyebrow">Library</p>

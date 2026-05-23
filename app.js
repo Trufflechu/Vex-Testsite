@@ -7,10 +7,7 @@ const uploadButton = document.getElementById("uploadButton");
 const clearQueue = document.getElementById("clearQueue");
 const message = document.getElementById("message");
 const tabs = document.querySelectorAll(".tab");
-const homePanel = document.getElementById("homePanel");
-const uploadPanel = document.getElementById("uploadPanel");
-const libraryPanel = document.getElementById("libraryPanel");
-const settingsPanel = document.getElementById("settingsPanel");
+const tabPanels = document.querySelectorAll(".tab-panel");
 const libraryGrid = document.getElementById("libraryGrid");
 const libraryMessage = document.getElementById("libraryMessage");
 const refreshLibrary = document.getElementById("refreshLibrary");
@@ -49,13 +46,10 @@ const homeIntroInput = document.getElementById("homeIntroInput");
 const achievementsInput = document.getElementById("achievementsInput");
 const homeAlbumInput = document.getElementById("homeAlbumInput");
 const homeCategoryInput = document.getElementById("homeCategoryInput");
-const sectionNav = document.getElementById("sectionNav");
 const introScreen = document.getElementById("introScreen");
 const introProgress = document.getElementById("introProgress");
 const introPercent = document.getElementById("introPercent");
 const introContinue = document.getElementById("introContinue");
-const focusNavButtons = document.querySelectorAll("[data-focus-target]");
-const focusSections = document.querySelectorAll(".focus-section");
 
 let selectedFiles = [];
 let libraryFiles = [];
@@ -200,13 +194,6 @@ introContinue.addEventListener("click", () => {
   finishIntro();
 });
 
-focusNavButtons.forEach((button) => {
-  button.addEventListener("click", () => {
-    switchTab("home");
-    switchFocusPage(button.dataset.focusTarget);
-  });
-});
-
 uploadButton.addEventListener("click", async () => {
   const endpoint = endpointInput.value.trim();
   if (!endpoint) {
@@ -251,11 +238,9 @@ uploadButton.addEventListener("click", async () => {
 
 function switchTab(tabName) {
   tabs.forEach((tab) => tab.classList.toggle("active", tab.dataset.tab === tabName));
-  sectionNav.classList.toggle("active", tabName === "home");
-  homePanel.classList.toggle("active", tabName === "home");
-  uploadPanel.classList.toggle("active", tabName === "upload");
-  libraryPanel.classList.toggle("active", tabName === "library");
-  settingsPanel.classList.toggle("active", tabName === "settings");
+  tabPanels.forEach((panel) => {
+    panel.classList.toggle("active", panel.dataset.panel === tabName);
+  });
 
   if (tabName === "library" || tabName === "home") {
     loadLibrary();
@@ -312,15 +297,6 @@ function finishIntro() {
   window.setTimeout(() => {
     introScreen.classList.add("intro-hidden");
   }, 700);
-}
-
-function switchFocusPage(targetId) {
-  focusNavButtons.forEach((button) => {
-    button.classList.toggle("active", button.dataset.focusTarget === targetId);
-  });
-  focusSections.forEach((section) => {
-    section.classList.toggle("active", section.id === targetId);
-  });
 }
 
 async function loadLibrary() {
