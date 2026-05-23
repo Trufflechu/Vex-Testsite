@@ -55,14 +55,15 @@
         <h1>2622T<br />TRITIUM</h1>
         <p class="summary">A high-contrast archive for build progress, competition moments, team achievements, and the photos that tell the season story.</p>
         <button class="replay-intro" id="replayIntro" type="button">Replay Intro</button>
-        <div class="marquee-strip" aria-label="Team focus areas">
-          <span>Engineering Builds</span>
-          <span>Strategic Planning</span>
-          <span>Software Implementation</span>
-          <span>Research & Development</span>
-          <span>Project Documentation</span>
-        </div>
       </section>
+
+      <nav class="section-nav" aria-label="Home sections">
+        <button type="button" data-scroll-target="engineering-builds">Engineering Builds</button>
+        <button type="button" data-scroll-target="strategic-planning">Strategic Planning</button>
+        <button type="button" data-scroll-target="software-implementation">Software Implementation</button>
+        <button type="button" data-scroll-target="research-development">Research & Development</button>
+        <button type="button" data-scroll-target="project-documentation">Project Documentation</button>
+      </nav>
 
       <section class="home-panel tab-panel active" id="homePanel" aria-labelledby="home-title">
         <div class="home-copy">
@@ -79,6 +80,31 @@
             </div>
           </div>
           <div class="achievement-list" id="achievementList"></div>
+        </section>
+        <section class="focus-section" id="engineering-builds">
+          <p class="eyebrow">01 // Build</p>
+          <h2>Engineering Builds</h2>
+          <p>Track robot iterations, mechanical experiments, subsystem changes, and the physical work that moves the season forward.</p>
+        </section>
+        <section class="focus-section" id="strategic-planning">
+          <p class="eyebrow">02 // Strategy</p>
+          <h2>Strategic Planning</h2>
+          <p>Collect match prep, decision logs, scouting takeaways, and competition strategy photos in one place.</p>
+        </section>
+        <section class="focus-section" id="software-implementation">
+          <p class="eyebrow">03 // Software</p>
+          <h2>Software Implementation</h2>
+          <p>Document autonomous testing, control tuning, code reviews, and the software work behind the robot.</p>
+        </section>
+        <section class="focus-section" id="research-development">
+          <p class="eyebrow">04 // R&D</p>
+          <h2>Research & Development</h2>
+          <p>Save prototypes, failed ideas, design comparisons, and the experiments that shape better engineering choices.</p>
+        </section>
+        <section class="focus-section" id="project-documentation">
+          <p class="eyebrow">05 // Archive</p>
+          <h2>Project Documentation</h2>
+          <p>Keep notebook evidence, outreach photos, event records, and final season documentation organized for review.</p>
         </section>
       </section>
 

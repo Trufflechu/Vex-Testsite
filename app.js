@@ -54,6 +54,7 @@ const introProgress = document.getElementById("introProgress");
 const introPercent = document.getElementById("introPercent");
 const introContinue = document.getElementById("introContinue");
 const replayIntro = document.getElementById("replayIntro");
+const sectionNavButtons = document.querySelectorAll("[data-scroll-target]");
 
 let selectedFiles = [];
 let libraryFiles = [];
@@ -201,6 +202,19 @@ introContinue.addEventListener("click", () => {
 replayIntro.addEventListener("click", () => {
   localStorage.removeItem("tritiumIntroSeen");
   startIntro(true);
+});
+
+sectionNavButtons.forEach((button) => {
+  button.addEventListener("click", () => {
+    switchTab("home");
+    const target = document.getElementById(button.dataset.scrollTarget);
+    if (target) {
+      target.scrollIntoView({
+        behavior: "smooth",
+        block: "start"
+      });
+    }
+  });
 });
 
 uploadButton.addEventListener("click", async () => {
