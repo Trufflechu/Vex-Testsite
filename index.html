@@ -13,9 +13,18 @@
   <body>
     <section class="intro-screen" id="introScreen" aria-label="Loading intro">
       <div class="intro-grid" aria-hidden="true"></div>
+      <div class="intro-scan" aria-hidden="true"></div>
       <div class="intro-content">
-        <p class="intro-kicker">2622T // Robotics Archive</p>
+        <div class="intro-topline">
+          <p class="intro-kicker">2622T // Robotics Archive</p>
+          <span>System boot</span>
+        </div>
         <h2>TRITIUM</h2>
+        <div class="intro-diagnostics" aria-hidden="true">
+          <span>Media core: online</span>
+          <span>Drive link: standing by</span>
+          <span>Archive interface: armed</span>
+        </div>
         <div class="intro-progress" aria-hidden="true">
           <span id="introProgress"></span>
         </div>
@@ -54,15 +63,14 @@
         <p class="eyebrow">2025-2026 // Robotics Media Archive</p>
         <h1>2622T<br />TRITIUM</h1>
         <p class="summary">A high-contrast archive for build progress, competition moments, team achievements, and the photos that tell the season story.</p>
-        <button class="replay-intro" id="replayIntro" type="button">Replay Intro</button>
       </section>
 
-      <nav class="section-nav" aria-label="Home sections">
-        <button type="button" data-scroll-target="engineering-builds">Engineering Builds</button>
-        <button type="button" data-scroll-target="strategic-planning">Strategic Planning</button>
-        <button type="button" data-scroll-target="software-implementation">Software Implementation</button>
-        <button type="button" data-scroll-target="research-development">Research & Development</button>
-        <button type="button" data-scroll-target="project-documentation">Project Documentation</button>
+      <nav class="section-nav" aria-label="Home subpages">
+        <button class="active" type="button" data-focus-target="engineering-builds">Engineering Builds</button>
+        <button type="button" data-focus-target="strategic-planning">Strategic Planning</button>
+        <button type="button" data-focus-target="software-implementation">Software Implementation</button>
+        <button type="button" data-focus-target="research-development">Research & Development</button>
+        <button type="button" data-focus-target="project-documentation">Project Documentation</button>
       </nav>
 
       <section class="home-panel tab-panel active" id="homePanel" aria-labelledby="home-title">
@@ -81,7 +89,7 @@
           </div>
           <div class="achievement-list" id="achievementList"></div>
         </section>
-        <section class="focus-section" id="engineering-builds">
+        <section class="focus-section active" id="engineering-builds">
           <p class="eyebrow">01 // Build</p>
           <h2>Engineering Builds</h2>
           <p>Track robot iterations, mechanical experiments, subsystem changes, and the physical work that moves the season forward.</p>

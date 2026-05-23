@@ -53,8 +53,8 @@ const introScreen = document.getElementById("introScreen");
 const introProgress = document.getElementById("introProgress");
 const introPercent = document.getElementById("introPercent");
 const introContinue = document.getElementById("introContinue");
-const replayIntro = document.getElementById("replayIntro");
-const sectionNavButtons = document.querySelectorAll("[data-scroll-target]");
+const focusNavButtons = document.querySelectorAll("[data-focus-target]");
+const focusSections = document.querySelectorAll(".focus-section");
 
 let selectedFiles = [];
 let libraryFiles = [];
@@ -199,21 +199,10 @@ introContinue.addEventListener("click", () => {
   finishIntro();
 });
 
-replayIntro.addEventListener("click", () => {
-  localStorage.removeItem("tritiumIntroSeen");
-  startIntro(true);
-});
-
-sectionNavButtons.forEach((button) => {
+focusNavButtons.forEach((button) => {
   button.addEventListener("click", () => {
     switchTab("home");
-    const target = document.getElementById(button.dataset.scrollTarget);
-    if (target) {
-      target.scrollIntoView({
-        behavior: "smooth",
-        block: "start"
-      });
-    }
+    switchFocusPage(button.dataset.focusTarget);
   });
 });
 
@@ -281,12 +270,7 @@ function updateMenuState() {
   menuButton.setAttribute("aria-expanded", String(open));
 }
 
-function startIntro(force = false) {
-  if (!force && localStorage.getItem("tritiumIntroSeen") === "true") {
-    introScreen.classList.add("intro-hidden");
-    return;
-  }
-
+function startIntro() {
   introScreen.classList.remove("intro-hidden", "intro-complete");
   introProgress.style.width = "0%";
   introPercent.textContent = "00";
@@ -312,8 +296,16 @@ function startIntro(force = false) {
 }
 
 function finishIntro() {
-  localStorage.setItem("tritiumIntroSeen", "true");
   introScreen.classList.add("intro-hidden");
+}
+
+function switchFocusPage(targetId) {
+  focusNavButtons.forEach((button) => {
+    button.classList.toggle("active", button.dataset.focusTarget === targetId);
+  });
+  focusSections.forEach((section) => {
+    section.classList.toggle("active", section.id === targetId);
+  });
 }
 
 async function loadLibrary() {
