@@ -273,7 +273,7 @@ function updateMenuState() {
 }
 
 function startIntro() {
-  introScreen.classList.remove("intro-hidden", "intro-complete");
+  introScreen.classList.remove("intro-hidden", "intro-complete", "intro-burst", "intro-exiting");
   introProgress.style.width = "0%";
   introPercent.textContent = "00";
 
@@ -291,6 +291,12 @@ function startIntro() {
       requestAnimationFrame(tick);
     } else {
       introScreen.classList.add("intro-complete");
+      window.setTimeout(() => {
+        if (!introScreen.classList.contains("intro-hidden")) {
+          introScreen.classList.add("intro-burst");
+          window.setTimeout(finishIntro, 950);
+        }
+      }, 180);
     }
   }
 
@@ -298,7 +304,14 @@ function startIntro() {
 }
 
 function finishIntro() {
-  introScreen.classList.add("intro-hidden");
+  if (introScreen.classList.contains("intro-exiting") || introScreen.classList.contains("intro-hidden")) {
+    return;
+  }
+
+  introScreen.classList.add("intro-exiting");
+  window.setTimeout(() => {
+    introScreen.classList.add("intro-hidden");
+  }, 700);
 }
 
 function switchFocusPage(targetId) {
