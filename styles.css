@@ -384,13 +384,17 @@ h2 {
   position: sticky;
   top: 0;
   z-index: 10;
-  display: grid;
+  display: none;
   grid-template-columns: repeat(5, minmax(0, 1fr));
   margin: 0 0 18px;
   border: 2px solid var(--line);
   background: var(--surface-2);
   color: #ffffff;
   box-shadow: 0 6px 0 rgba(11, 11, 11, 0.18);
+}
+
+.section-nav.active {
+  display: grid;
 }
 
 .section-nav button {

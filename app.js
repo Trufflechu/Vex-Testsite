@@ -49,6 +49,7 @@ const homeIntroInput = document.getElementById("homeIntroInput");
 const achievementsInput = document.getElementById("achievementsInput");
 const homeAlbumInput = document.getElementById("homeAlbumInput");
 const homeCategoryInput = document.getElementById("homeCategoryInput");
+const sectionNav = document.getElementById("sectionNav");
 const introScreen = document.getElementById("introScreen");
 const introProgress = document.getElementById("introProgress");
 const introPercent = document.getElementById("introPercent");
@@ -250,6 +251,7 @@ uploadButton.addEventListener("click", async () => {
 
 function switchTab(tabName) {
   tabs.forEach((tab) => tab.classList.toggle("active", tab.dataset.tab === tabName));
+  sectionNav.classList.toggle("active", tabName === "home");
   homePanel.classList.toggle("active", tabName === "home");
   uploadPanel.classList.toggle("active", tabName === "upload");
   libraryPanel.classList.toggle("active", tabName === "library");
