@@ -11,6 +11,15 @@ const tabPanels = document.querySelectorAll(".tab-panel");
 const libraryGrid = document.getElementById("libraryGrid");
 const libraryMessage = document.getElementById("libraryMessage");
 const refreshLibrary = document.getElementById("refreshLibrary");
+const notebookEntries = document.getElementById("notebookEntries");
+const notebookMessage = document.getElementById("notebookMessage");
+const refreshNotebook = document.getElementById("refreshNotebook");
+const exportNotebook = document.getElementById("exportNotebook");
+const notebookSearch = document.getElementById("notebookSearch");
+const notebookCategory = document.getElementById("notebookCategory");
+const notebookMember = document.getElementById("notebookMember");
+const notebookGroup = document.getElementById("notebookGroup");
+const notebookSort = document.getElementById("notebookSort");
 const photoDialog = document.getElementById("photoDialog");
 const closeEditor = document.getElementById("closeEditor");
 const editorImage = document.getElementById("editorImage");
@@ -119,6 +128,18 @@ teamMembersInput.addEventListener("input", () => {
 });
 
 [
+  notebookSearch,
+  notebookCategory,
+  notebookMember,
+  notebookGroup,
+  notebookSort
+].forEach((control) => {
+  control.addEventListener("input", () => {
+    renderNotebook();
+  });
+});
+
+[
   homeTitleInput,
   homeIntroInput,
   achievementsInput,
@@ -176,6 +197,15 @@ clearQueue.addEventListener("click", () => {
 
 refreshLibrary.addEventListener("click", () => {
   loadLibrary();
+});
+
+refreshNotebook.addEventListener("click", () => {
+  loadLibrary();
+});
+
+exportNotebook.addEventListener("click", () => {
+  renderNotebook();
+  window.print();
 });
 
 closeEditor.addEventListener("click", () => {
@@ -242,7 +272,7 @@ function switchTab(tabName) {
     panel.classList.toggle("active", panel.dataset.panel === tabName);
   });
 
-  if (tabName === "library" || tabName === "home") {
+  if (tabName === "library" || tabName === "home" || tabName === "notebook") {
     loadLibrary();
   }
 }
@@ -304,11 +334,15 @@ async function loadLibrary() {
   if (!endpoint) {
     setLibraryMessage("Open Settings and connect the Google Apps Script URL first.", "error");
     libraryGrid.innerHTML = "";
+    notebookEntries.innerHTML = "";
+    setNotebookMessage("Open Settings and connect the Google Apps Script URL first.", "error");
     return;
   }
 
   refreshLibrary.disabled = true;
+  refreshNotebook.disabled = true;
   setLibraryMessage("Loading photos...", "");
+  setNotebookMessage("Loading notebook entries...", "");
 
   try {
     const url = new URL(endpoint);
@@ -325,11 +359,15 @@ async function loadLibrary() {
     libraryFiles = result.files.map(normalizeFileRecord);
     updateLibraryControls();
     applyLibraryView();
+    renderNotebook();
   } catch (error) {
     libraryGrid.innerHTML = "";
+    notebookEntries.innerHTML = "";
     setLibraryMessage(error.message || "Could not load the library. Check your Apps Script deployment.", "error");
+    setNotebookMessage(error.message || "Could not load the notebook entries.", "error");
   } finally {
     refreshLibrary.disabled = false;
+    refreshNotebook.disabled = false;
   }
 }
 
@@ -337,6 +375,7 @@ function applyLibraryView() {
   const files = sortFiles(filterFiles(libraryFiles));
   renderLibrary(files);
   renderHome();
+  renderNotebook();
   const total = libraryFiles.length;
   const shown = files.length;
   setLibraryMessage(total ? `${shown} of ${total} photo${total === 1 ? "" : "s"} shown.` : "No photos have been uploaded yet.", total ? "success" : "");
@@ -426,6 +465,113 @@ function renderLibrary(files) {
       openEditor(button.dataset.edit);
     });
   });
+}
+
+function renderNotebook() {
+  const files = sortNotebookFiles(filterNotebookFiles(libraryFiles));
+  const grouped = groupNotebookEntries(files);
+
+  notebookEntries.innerHTML = grouped.length
+    ? grouped.map((group) => `<section class="notebook-group">
+        <div class="notebook-group-heading">
+          <p class="eyebrow">${escapeHtml(notebookGroupLabel())}</p>
+          <h3>${escapeHtml(group.name)}</h3>
+        </div>
+        <div class="notebook-entry-list">
+          ${group.files.map(renderNotebookEntry).join("")}
+        </div>
+      </section>`).join("")
+    : `<div class="empty-state">Upload photos with notes to start your engineering notebook.</div>`;
+
+  setNotebookMessage(files.length ? `${files.length} notebook entr${files.length === 1 ? "y" : "ies"} ready to export.` : "No notebook entries yet.", files.length ? "success" : "");
+}
+
+function filterNotebookFiles(files) {
+  const query = notebookSearch.value.trim().toLowerCase();
+  const category = notebookCategory.value;
+  const member = notebookMember.value;
+
+  return files.filter((file) => {
+    const haystack = [
+      file.title,
+      file.name,
+      file.teamMember,
+      file.album,
+      file.category,
+      file.notes,
+      file.tags.join(" ")
+    ].join(" ").toLowerCase();
+
+    return (!query || haystack.includes(query))
+      && (!category || file.category === category)
+      && (!member || file.teamMember === member);
+  });
+}
+
+function sortNotebookFiles(files) {
+  return [...files].sort((a, b) => {
+    const difference = getSortTime(a) - getSortTime(b);
+    return notebookSort.value === "oldest" ? difference : -difference;
+  });
+}
+
+function groupNotebookEntries(files) {
+  const groups = new Map();
+  files.forEach((file) => {
+    const key = notebookGroupKey(file);
+    if (!groups.has(key)) {
+      groups.set(key, []);
+    }
+    groups.get(key).push(file);
+  });
+
+  return [...groups.entries()].map(([name, groupFiles]) => ({
+    name,
+    files: groupFiles
+  }));
+}
+
+function notebookGroupKey(file) {
+  if (notebookGroup.value === "category") {
+    return file.category || "Uncategorized";
+  }
+  if (notebookGroup.value === "album") {
+    return file.album || "No album";
+  }
+  if (notebookGroup.value === "member") {
+    return file.teamMember || "Unassigned";
+  }
+  return formatNotebookDate(file.dateTime || file.created) || "Undated";
+}
+
+function notebookGroupLabel() {
+  const labels = {
+    date: "Date",
+    category: "Category",
+    album: "Album",
+    member: "Team member"
+  };
+  return labels[notebookGroup.value] || "Date";
+}
+
+function renderNotebookEntry(file) {
+  const meta = [
+    formatDisplayDate(file.dateTime || file.created),
+    file.teamMember,
+    file.album,
+    file.category
+  ].filter(Boolean).join(" - ");
+
+  return `<article class="notebook-entry">
+    <img src="${escapeAttr(file.thumbnailUrl)}" alt="${escapeAttr(file.title || file.name)}" loading="lazy">
+    <div class="notebook-entry-copy">
+      <h4>${escapeHtml(file.title || file.name)}</h4>
+      <small>${escapeHtml(meta || "No details added")}</small>
+      <p>${escapeHtml(file.notes || "No notes yet.")}</p>
+      <div class="tag-row">${file.tags.map((tag) => `<span>${escapeHtml(tag)}</span>`).join("")}</div>
+      <a href="${escapeAttr(file.url)}" target="_blank" rel="noreferrer">Open Drive photo</a>
+    </div>
+  </article>`;
 }
 
 function addFiles(fileList) {
@@ -525,6 +671,8 @@ function updateLibraryControls() {
   fillSelect(categoryFilter, categories, "All categories");
   fillSelect(memberFilter, members, "All members");
   fillSelect(tagFilter, tags, "All tags");
+  fillSelect(notebookCategory, categories, "All categories");
+  fillSelect(notebookMember, members, "All members");
   fillDatalist(albumOptions, albums);
   fillDatalist(categoryOptions, categories);
 }
@@ -770,6 +918,11 @@ function setLibraryMessage(text, type) {
   libraryMessage.className = `message ${type}`;
 }
 
+function setNotebookMessage(text, type) {
+  notebookMessage.textContent = text;
+  notebookMessage.className = `message ${type}`;
+}
+
 function setEditorMessage(text, type) {
   editorMessage.textContent = text;
   editorMessage.className = `message ${type}`;
@@ -807,6 +960,23 @@ function formatDisplayDate(value) {
     year: "numeric",
     hour: "numeric",
     minute: "2-digit"
+  });
+}
+
+function formatNotebookDate(value) {
+  if (!value) {
+    return "";
+  }
+
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) {
+    return value;
+  }
+
+  return date.toLocaleDateString([], {
+    month: "long",
+    day: "numeric",
+    year: "numeric"
   });
 }
 

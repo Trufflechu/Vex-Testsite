@@ -62,6 +62,7 @@
       </div>
       <nav class="side-nav">
         <button class="tab active" type="button" data-tab="home">Home</button>
+        <button class="tab" type="button" data-tab="notebook">Notebook</button>
         <button class="tab" type="button" data-tab="engineering-builds">Engineering Builds</button>
         <button class="tab" type="button" data-tab="strategic-planning">Strategic Planning</button>
         <button class="tab" type="button" data-tab="software-implementation">Software Implementation</button>
@@ -96,6 +97,56 @@
           </div>
           <div class="achievement-list" id="achievementList"></div>
         </section>
+      </section>
+
+      <section class="panel tab-panel notebook-panel" id="notebookPanel" data-panel="notebook" aria-labelledby="notebook-title">
+        <div class="panel-heading">
+          <div>
+            <p class="eyebrow">Engineering Notebook</p>
+            <h2 id="notebook-title">Season logbook</h2>
+          </div>
+          <div class="action-row">
+            <button class="secondary-button" id="refreshNotebook" type="button">Refresh</button>
+            <button class="primary-button compact-button" id="exportNotebook" type="button">Export PDF</button>
+          </div>
+        </div>
+        <div class="filter-grid">
+          <label class="field">
+            Search notebook
+            <input id="notebookSearch" type="search" placeholder="Build, testing, notes..." />
+          </label>
+          <label class="field">
+            Category
+            <select id="notebookCategory"></select>
+          </label>
+          <label class="field">
+            Team member
+            <select id="notebookMember"></select>
+          </label>
+          <label class="field">
+            Group by
+            <select id="notebookGroup">
+              <option value="date">Date</option>
+              <option value="category">Category</option>
+              <option value="album">Album</option>
+              <option value="member">Team member</option>
+            </select>
+          </label>
+          <label class="field">
+            Sort
+            <select id="notebookSort">
+              <option value="newest">Newest first</option>
+              <option value="oldest">Oldest first</option>
+            </select>
+          </label>
+        </div>
+        <div class="notebook-cover">
+          <p class="eyebrow">2622T Tritium</p>
+          <h2>Engineering Notebook</h2>
+          <p>Photo evidence, build notes, testing records, and team documentation exported from the robotics archive.</p>
+        </div>
+        <div class="notebook-entries" id="notebookEntries" aria-live="polite"></div>
+        <p class="message" id="notebookMessage" role="status"></p>
       </section>
 
       <section class="focus-section tab-panel" id="engineering-buildsPanel" data-panel="engineering-builds" aria-labelledby="engineering-builds-title">
